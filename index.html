@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CashMates · Split bills, not friendships</title>
+  <meta name="description" content="Apunta los gastos del piso, separa lo común de lo personal y mira cuánto te deben. Gratis y sin conectar tu banco.">
+  <link rel="stylesheet" href="estilos.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+
+  <header class="cabecera">
+    <a class="logo" href="#inicio">cashmates</a>
+    <a class="boton boton-pequeno" href="#demo">Probar</a>
+  </header>
+
+  <main>
+
+    <!-- PORTADA: nombre, eslogan y frase de valor -->
+    <section id="inicio" class="portada">
+      <h1>Split bills, not friendships.</h1>
+      <p>Apunta lo que pagas, separa lo común de lo personal y mira al momento cuánto te deben.</p>
+      <a class="boton" href="#demo">Pruébalo gratis</a>
+    </section>
+
+    <!-- PROBLEMA: datos del Sprint 1 -->
+    <section id="problema" class="seccion">
+      <h2>Pagar ya es fácil. Llevar las cuentas, no.</h2>
+      <ol class="pasos">
+        <li>Uno paga el alquiler, la luz o la cena y el resto le devuelve su parte por Bizum.</li>
+        <li>Las deudas acaban en las notas del móvil, en WhatsApp o de memoria.</li>
+        <li>Al final se olvidan y aparecen los malentendidos.</li>
+      </ol>
+      <ul class="cifras">
+        <li>
+          <strong>425 €/mes</strong>
+          <span>precio medio de una habitación en 2025</span>
+        </li>
+        <li>
+          <strong>+19 %</strong>
+          <span>ofertas de pisos compartidos en 2025</span>
+        </li>
+        <li>
+          <strong>1 de cada 2</strong>
+          <span>comparte piso porque no puede pagarlo solo</span>
+        </li>
+      </ul>
+      <p class="fuentes">Fuentes: idealista (2025), Fotocasa vía Forbes, bunq (2025).</p>
+    </section>
+
+    <!-- SOLUCIÓN: beneficios, sin tecnicismos -->
+    <section id="solucion" class="seccion">
+      <h2>Todo en un solo sitio, y gratis</h2>
+      <ul class="tarjetas">
+        <li>
+          <h3>Apunta en segundos</h3>
+          <p>Quién ha pagado, cuánto y entre quiénes se reparte.</p>
+        </li>
+        <li>
+          <h3>Lo tuyo es tuyo</h3>
+          <p>Tus gastos personales no los ve nadie del grupo.</p>
+        </li>
+        <li>
+          <h3>Cuentas claras</h3>
+          <p>Ves cuánto has gastado y cuánto te debe el piso.</p>
+        </li>
+      </ul>
+      <p class="nota">CashMates no mueve dinero ni se conecta a tu banco. Los pagos siguen por Bizum.</p>
+    </section>
+
+    <!-- VÍDEO CONCEPTUAL: sustituir el contenido de #video-contenedor por el iframe del vídeo -->
+    <section id="video" class="seccion">
+      <h2>Mira cómo funciona</h2>
+      <div id="video-contenedor" class="video">
+        <p>Vídeo conceptual de 1 minuto</p>
+      </div>
+    </section>
+
+    <!-- LLAMADA A LA ACCIÓN -->
+    <section id="llamada" class="seccion llamada">
+      <h2>Tu piso, sin discusiones por dinero</h2>
+      <p>Apunta tu primer gasto ahora.</p>
+      <a class="boton" href="#demo">Empezar</a>
+    </section>
+
+    <!-- DEMO -->
+    <section id="demo" class="seccion demo">
+      <h2>Tus cuentas</h2>
+
+      <!-- AÑADIR UN PAGO -->
+      <form id="form-pago" class="tarjeta formulario">
+        <h3>Añadir un pago</h3>
+
+        <fieldset id="selector-tipo" class="selector-tipo">
+          <legend>Tipo de pago</legend>
+          <label>
+            <input type="radio" name="tipo" value="grupal" checked>
+            <span>Grupal</span>
+          </label>
+          <label>
+            <input type="radio" name="tipo" value="personal">
+            <span>Personal</span>
+          </label>
+        </fieldset>
+
+        <label for="pago-importe">Importe (€)</label>
+        <input id="pago-importe" name="importe" type="number" inputmode="decimal" min="0.01" step="0.01" placeholder="20,00" required>
+
+        <label for="pago-concepto">Concepto</label>
+        <input id="pago-concepto" name="concepto" type="text" maxlength="40" placeholder="Wifi" autocomplete="off" required>
+
+        <!-- Solo para pagos grupales. El JS rellena #lista-miembros con las personas del grupo -->
+        <fieldset id="bloque-reparto">
+          <legend>Se reparte entre</legend>
+          <div id="lista-miembros" class="miembros"></div>
+        </fieldset>
+
+        <button id="boton-anadir" class="boton" type="submit">Añadir pago</button>
+      </form>
+
+      <!-- GRÁFICO DE GASTO: el JS actualiza los importes y el ancho de cada tramo -->
+      <section id="resumen" class="tarjeta" aria-labelledby="titulo-resumen">
+        <h3 id="titulo-resumen">Has gastado</h3>
+        <p id="total-gastado" class="cifra-grande">0,00 €</p>
+
+        <div id="grafico" class="grafico" role="img" aria-label="Reparto de tu gasto entre personal y grupal">
+          <div id="tramo-personal" class="tramo tramo-personal"></div>
+          <div id="tramo-grupal" class="tramo tramo-grupal"></div>
+        </div>
+
+        <ul class="leyenda">
+          <li class="leyenda-personal">Personal: <strong id="valor-personal">0,00 €</strong></li>
+          <li class="leyenda-grupal">Grupal: <strong id="valor-grupal">0,00 €</strong></li>
+        </ul>
+
+        <p id="saldo" class="saldo">
+          <span id="saldo-etiqueta">Te debe el grupo</span>
+          <strong id="saldo-valor">0,00 €</strong>
+        </p>
+      </section>
+    </section>
+
+  </main>
+
+  <footer class="pie">
+    <p>CashMates · Equipo E1 · Proyectos III · U-tad · 2026</p>
+  </footer>
+
+</body>
+</html>
