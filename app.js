@@ -1,337 +1,462 @@
 /* =========================================================================
-   CashMates · app.js
-   Lógica de la demo "Tus cuentas" de la one page.
+   CashMates · app.js  (demo de la one page)
 
-   Qué hace:
-   - Rellena #lista-miembros con las personas del piso (casillas).
-   - Muestra u oculta "Se reparte entre" según el pago sea grupal o personal.
-   - Valida el formulario y añade el pago.
-   - Recalcula: total gastado, tramos del gráfico personal/grupal y saldo
-     con el grupo (te deben / debes / en paz).
+   Índice:
+     1. Datos de la demo
+     2. Elementos de la página
+     3. Formulario: quién paga, entre quiénes se reparte, tipo de pago
+     4. Añadir un pago
+     5. Cálculos y resumen ("Has gastado", gráfico y saldo)
+     6. Historial de pagos (con borrar)
+     7. Guardar los pagos en el navegador
+     8. Vídeo conceptual
+     9. Animaciones al hacer scroll y contadores de las cifras
+    10. Arranque
 
-   Cómo se calcula (todo en céntimos para evitar errores de redondeo):
+   Cómo se calcula el dinero:
    - Personal: suma de tus pagos personales.
-   - Grupal: tu parte de cada pago grupal (importe / nº de personas entre las
-     que se reparte, solo si tú estás incluido).
-   - Has gastado = Personal + Grupal  -> lo que de verdad te ha costado a ti.
-   - Saldo = lo que has adelantado por el grupo - tu parte.
-       > 0  "Te debe el grupo"
-       < 0  "Debes al grupo"
-       = 0  "Estás en paz"
+   - Grupal: tu parte de cada pago grupal (importe / nº de personas),
+     solo si tú estás entre las personas del reparto.
+   - Has gastado = Personal + Grupal.
+   - Saldo = lo que tú has pagado por el grupo - tu parte de los gastos.
+       positivo -> "Te debe el grupo"
+       negativo -> "Debes al grupo"
 
-   CashMates no mueve dinero: aquí solo se apuntan gastos.
-
-   Ganchos para el CSS (no cambian el HTML, solo añaden clases/atributos):
-   - #lista-miembros > label.miembro > input[type=checkbox] + span
-   - #bloque-reparto recibe [hidden] cuando el pago es personal
-   - #saldo recibe data-estado="positivo" | "negativo" | "cero"
-   - #boton-anadir recibe la clase "anadido" durante 1,5 s tras añadir
-   - .cabecera recibe la clase "con-sombra" al hacer scroll
+   Clases y atributos que añade el JS (por si el CSS los quiere usar):
+   - label.miembro                (cada persona en "Se reparte entre")
+   - #campo-pagador               (bloque "¿Quién ha pagado?")
+   - #historial, .pago, .boton-borrar, #borrar-todo
+   - #saldo[data-estado="positivo" | "negativo" | "cero"]
+   - #boton-anadir.anadido        (1,5 s después de añadir un pago)
+   - .cabecera.con-sombra         (al hacer scroll)
    ========================================================================= */
 
-(function () {
-  'use strict';
 
-  /* ---------- Datos de la demo ---------- */
+/* ---------- 1. Datos de la demo ---------- */
 
-  // La persona que usa la web siempre es "yo". El resto son compañeros de piso.
-  var YO = 'yo';
-  var MIEMBROS = [
-    { id: YO, nombre: 'Tú' },
-    { id: 'lucia', nombre: 'Lucía' },
-    { id: 'pablo', nombre: 'Pablo' },
-    { id: 'marta', nombre: 'Marta' }
-  ];
+const YO = 'Tú';
+const MIEMBROS = [YO, 'Lucía', 'Pablo', 'Marta'];
+const CLAVE_GUARDADO = 'cashmates-pagos';
 
-  var IMPORTE_MAXIMO = 100000; // €; evita cifras absurdas en la demo
+// Cada pago: { id, tipo, importe, concepto, pagador, reparto }
+// Ejemplo:   { id: 1, tipo: 'grupal', importe: 40, concepto: 'Wifi',
+//              pagador: 'Tú', reparto: ['Tú', 'Lucía', 'Pablo', 'Marta'] }
+let pagos = cargarPagos();
 
-  // Lista de pagos apuntados en esta sesión.
-  // { tipo: 'grupal'|'personal', centimos: 2000, concepto: 'Wifi', reparto: ['yo','lucia'] }
-  var pagos = [];
 
-  /* ---------- Utilidades ---------- */
+/* ---------- 2. Elementos de la página ---------- */
 
-  var formatoEuros = new Intl.NumberFormat('es-ES', {
-    style: 'currency',
-    currency: 'EUR',
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
+const form = document.getElementById('form-pago');
+const inputImporte = document.getElementById('pago-importe');
+const inputConcepto = document.getElementById('pago-concepto');
+const bloqueReparto = document.getElementById('bloque-reparto');
+const listaMiembros = document.getElementById('lista-miembros');
+const botonAnadir = document.getElementById('boton-anadir');
+
+
+/* ---------- 3. Formulario ---------- */
+
+// Convierte un número en texto con euros: 1234.5 -> "1234,50 €"
+function euros(cantidad) {
+  return cantidad.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' });
+}
+
+// Crea el desplegable "¿Quién ha pagado?" justo antes de "Se reparte entre"
+function crearSelectorPagador() {
+  const campo = document.createElement('div');
+  campo.id = 'campo-pagador';
+
+  const label = document.createElement('label');
+  label.htmlFor = 'pago-pagador';
+  label.textContent = '¿Quién ha pagado?';
+
+  const select = document.createElement('select');
+  select.id = 'pago-pagador';
+  select.name = 'pagador';
+
+  MIEMBROS.forEach(function (nombre) {
+    const opcion = document.createElement('option');
+    opcion.value = nombre;
+    opcion.textContent = nombre;
+    select.appendChild(opcion);
   });
 
-  function euros(centimos) {
-    return formatoEuros.format(centimos / 100);
+  campo.appendChild(label);
+  campo.appendChild(select);
+  form.insertBefore(campo, bloqueReparto);
+}
+
+// Rellena "Se reparte entre" con una casilla por persona (todas marcadas)
+function crearCasillasMiembros() {
+  listaMiembros.innerHTML = '';
+  MIEMBROS.forEach(function (nombre) {
+    const label = document.createElement('label');
+    label.className = 'miembro';
+    label.innerHTML = '<input type="checkbox" name="reparto" checked> <span></span>';
+    label.querySelector('input').value = nombre;
+    label.querySelector('span').textContent = nombre;
+    listaMiembros.appendChild(label);
+  });
+}
+
+function tipoElegido() {
+  return form.querySelector('input[name="tipo"]:checked').value; // 'grupal' o 'personal'
+}
+
+// Los pagos personales son solo tuyos: se ocultan "quién paga" y el reparto
+function actualizarTipo() {
+  const esGrupal = tipoElegido() === 'grupal';
+  bloqueReparto.hidden = !esGrupal;
+  document.getElementById('campo-pagador').hidden = !esGrupal;
+}
+
+// Muestra un aviso del navegador junto al campo que está mal
+function mostrarError(campo, mensaje) {
+  campo.setCustomValidity(mensaje);
+  campo.reportValidity();
+  // Se borra en cuanto el usuario toca el campo
+  campo.addEventListener('input', function () { campo.setCustomValidity(''); }, { once: true });
+  campo.addEventListener('change', function () { campo.setCustomValidity(''); }, { once: true });
+}
+
+
+/* ---------- 4. Añadir un pago ---------- */
+
+function alEnviarFormulario(evento) {
+  evento.preventDefault(); // que no se recargue la página
+
+  // Admite "20,50" además de "20.50"
+  const importe = Number(String(inputImporte.value).replace(',', '.'));
+  const concepto = inputConcepto.value.trim();
+  const tipo = tipoElegido();
+
+  if (!(importe > 0)) {
+    mostrarError(inputImporte, 'Escribe cuánto se ha pagado, por ejemplo 20,00.');
+    return;
+  }
+  if (concepto === '') {
+    mostrarError(inputConcepto, 'Pon un concepto, por ejemplo "Wifi" o "Compra".');
+    return;
   }
 
-  function $(id) {
-    return document.getElementById(id);
-  }
+  let pagador = YO;
+  let reparto = [];
 
-  // Acepta "20", "20.5", "20,50" y "1.234,56". Devuelve céntimos o NaN.
-  function leerImporte(input) {
-    var texto = String(input.value || '').trim();
-    var numero = input.valueAsNumber;
+  if (tipo === 'grupal') {
+    pagador = document.getElementById('pago-pagador').value;
+    const marcadas = listaMiembros.querySelectorAll('input:checked');
+    marcadas.forEach(function (casilla) { reparto.push(casilla.value); });
 
-    if (isNaN(numero) && texto) {
-      if (texto.indexOf(',') !== -1) {
-        texto = texto.replace(/\./g, '').replace(',', '.');
-      }
-      numero = parseFloat(texto);
+    const primeraCasilla = listaMiembros.querySelector('input');
+    if (reparto.length === 0) {
+      mostrarError(primeraCasilla, 'Elige al menos una persona.');
+      return;
     }
-    if (isNaN(numero)) return NaN;
-    return Math.round(numero * 100);
-  }
-
-  /* ---------- Referencias al DOM ---------- */
-
-  var form = $('form-pago');
-  if (!form) return; // por si se carga en otra página
-
-  var inputImporte = $('pago-importe');
-  var inputConcepto = $('pago-concepto');
-  var bloqueReparto = $('bloque-reparto');
-  var listaMiembros = $('lista-miembros');
-  var botonAnadir = $('boton-anadir');
-
-  var totalGastado = $('total-gastado');
-  var grafico = $('grafico');
-  var tramoPersonal = $('tramo-personal');
-  var tramoGrupal = $('tramo-grupal');
-  var valorPersonal = $('valor-personal');
-  var valorGrupal = $('valor-grupal');
-  var saldo = $('saldo');
-  var saldoEtiqueta = $('saldo-etiqueta');
-  var saldoValor = $('saldo-valor');
-
-  /* ---------- Miembros del grupo ---------- */
-
-  function pintarMiembros() {
-    listaMiembros.textContent = '';
-    MIEMBROS.forEach(function (m) {
-      var label = document.createElement('label');
-      label.className = 'miembro';
-
-      var check = document.createElement('input');
-      check.type = 'checkbox';
-      check.name = 'reparto';
-      check.value = m.id;
-      check.checked = true;
-
-      var nombre = document.createElement('span');
-      nombre.textContent = m.nombre;
-
-      label.appendChild(check);
-      label.appendChild(nombre);
-      listaMiembros.appendChild(label);
-    });
-  }
-
-  function casillasMiembros() {
-    return listaMiembros.querySelectorAll('input[name="reparto"]');
-  }
-
-  function miembrosMarcados() {
-    var ids = [];
-    casillasMiembros().forEach(function (c) {
-      if (c.checked) ids.push(c.value);
-    });
-    return ids;
-  }
-
-  /* ---------- Tipo de pago ---------- */
-
-  function tipoSeleccionado() {
-    var marcado = form.querySelector('input[name="tipo"]:checked');
-    return marcado ? marcado.value : 'grupal';
-  }
-
-  function actualizarTipo() {
-    var esGrupal = tipoSeleccionado() === 'grupal';
-    bloqueReparto.hidden = !esGrupal;
-    // Un fieldset deshabilitado no se envía ni se valida
-    bloqueReparto.disabled = !esGrupal;
-    limpiarErrorReparto();
-  }
-
-  /* ---------- Validación ---------- */
-
-  function errorReparto(mensaje) {
-    var primera = casillasMiembros()[0];
-    if (!primera) return;
-    primera.setCustomValidity(mensaje);
-    primera.reportValidity();
-  }
-
-  function limpiarErrorReparto() {
-    var primera = casillasMiembros()[0];
-    if (primera) primera.setCustomValidity('');
-  }
-
-  function validar() {
-    inputImporte.setCustomValidity('');
-    inputConcepto.setCustomValidity('');
-    limpiarErrorReparto();
-
-    var centimos = leerImporte(inputImporte);
-    if (isNaN(centimos) || centimos <= 0) {
-      inputImporte.setCustomValidity('Escribe cuánto has pagado (por ejemplo, 20,00).');
-      inputImporte.reportValidity();
-      return null;
-    }
-    if (centimos > IMPORTE_MAXIMO * 100) {
-      inputImporte.setCustomValidity('El importe máximo es ' + euros(IMPORTE_MAXIMO * 100) + '.');
-      inputImporte.reportValidity();
-      return null;
-    }
-
-    var concepto = inputConcepto.value.trim();
-    if (!concepto) {
-      inputConcepto.setCustomValidity('Pon un concepto, por ejemplo "Wifi" o "Compra".');
-      inputConcepto.reportValidity();
-      return null;
-    }
-
-    var tipo = tipoSeleccionado();
-    var reparto = [];
-    if (tipo === 'grupal') {
-      reparto = miembrosMarcados();
-      if (reparto.length === 0) {
-        errorReparto('Elige al menos una persona para repartir el pago.');
-        return null;
-      }
-      if (reparto.length === 1 && reparto[0] === YO) {
-        errorReparto('Si solo es para ti, márcalo como pago personal.');
-        return null;
-      }
-    }
-
-    return { tipo: tipo, centimos: centimos, concepto: concepto, reparto: reparto };
-  }
-
-  /* ---------- Cálculos ---------- */
-
-  function calcularResumen() {
-    var personal = 0; // céntimos
-    var miParteGrupal = 0;
-    var adelantado = 0; // lo que he pagado por el grupo
-
-    pagos.forEach(function (p) {
-      if (p.tipo === 'personal') {
-        personal += p.centimos;
-        return;
-      }
-      adelantado += p.centimos;
-      if (p.reparto.indexOf(YO) !== -1) {
-        miParteGrupal += p.centimos / p.reparto.length;
-      }
-    });
-
-    miParteGrupal = Math.round(miParteGrupal);
-
-    return {
-      personal: personal,
-      grupal: miParteGrupal,
-      total: personal + miParteGrupal,
-      saldo: adelantado - miParteGrupal
-    };
-  }
-
-  /* ---------- Pintar el resumen ---------- */
-
-  function pintarResumen() {
-    var r = calcularResumen();
-
-    totalGastado.textContent = euros(r.total);
-    valorPersonal.textContent = euros(r.personal);
-    valorGrupal.textContent = euros(r.grupal);
-
-    var pctPersonal = r.total > 0 ? (r.personal / r.total) * 100 : 0;
-    var pctGrupal = r.total > 0 ? 100 - pctPersonal : 0;
-    tramoPersonal.style.width = pctPersonal + '%';
-    tramoGrupal.style.width = pctGrupal + '%';
-
-    grafico.setAttribute(
-      'aria-label',
-      r.total > 0
-        ? 'Reparto de tu gasto: ' + Math.round(pctPersonal) + ' % personal (' + euros(r.personal) +
-          ') y ' + Math.round(pctGrupal) + ' % grupal (' + euros(r.grupal) + ')'
-        : 'Todavía no has apuntado ningún gasto'
-    );
-
-    if (r.saldo > 0) {
-      saldo.dataset.estado = 'positivo';
-      saldoEtiqueta.textContent = 'Te debe el grupo';
-      saldoValor.textContent = euros(r.saldo);
-    } else if (r.saldo < 0) {
-      saldo.dataset.estado = 'negativo';
-      saldoEtiqueta.textContent = 'Debes al grupo';
-      saldoValor.textContent = euros(-r.saldo);
-    } else {
-      saldo.dataset.estado = 'cero';
-      saldoEtiqueta.textContent = pagos.length ? 'Estás en paz con el grupo' : 'Te debe el grupo';
-      saldoValor.textContent = euros(0);
+    if (reparto.length === 1 && reparto[0] === pagador) {
+      mostrarError(primeraCasilla, 'Si solo es para quien ha pagado, no es un gasto del grupo.');
+      return;
     }
   }
 
-  /* ---------- Añadir un pago ---------- */
+  pagos.push({
+    id: Date.now(),
+    tipo: tipo,
+    importe: Math.round(importe * 100) / 100,
+    concepto: concepto,
+    pagador: pagador,
+    reparto: reparto
+  });
 
-  var temporizadorBoton = null;
-  var textoBoton = botonAnadir ? botonAnadir.textContent : '';
+  actualizarTodo();
+  avisarEnBoton();
 
-  function confirmarEnBoton() {
-    if (!botonAnadir) return;
-    clearTimeout(temporizadorBoton);
-    botonAnadir.classList.add('anadido');
-    botonAnadir.textContent = '¡Pago añadido!';
-    temporizadorBoton = setTimeout(function () {
-      botonAnadir.classList.remove('anadido');
-      botonAnadir.textContent = textoBoton;
-    }, 1500);
+  // Deja el formulario listo para el siguiente pago
+  inputImporte.value = '';
+  inputConcepto.value = '';
+  listaMiembros.querySelectorAll('input').forEach(function (c) { c.checked = true; });
+  inputImporte.focus();
+}
+
+// El botón dice "¡Pago añadido!" durante 1,5 segundos
+function avisarEnBoton() {
+  botonAnadir.textContent = '¡Pago añadido!';
+  botonAnadir.classList.add('anadido');
+  setTimeout(function () {
+    botonAnadir.textContent = 'Añadir pago';
+    botonAnadir.classList.remove('anadido');
+  }, 1500);
+}
+
+
+/* ---------- 5. Cálculos y resumen ---------- */
+
+function calcular() {
+  let personal = 0;      // tus gastos personales
+  let miParte = 0;       // tu parte de los gastos del grupo
+  let pagadoPorMi = 0;   // lo que tú has adelantado por el grupo
+
+  pagos.forEach(function (pago) {
+    if (pago.tipo === 'personal') {
+      personal += pago.importe;
+      return;
+    }
+    if (pago.pagador === YO) {
+      pagadoPorMi += pago.importe;
+    }
+    if (pago.reparto.includes(YO)) {
+      miParte += pago.importe / pago.reparto.length;
+    }
+  });
+
+  return {
+    personal: personal,
+    grupal: miParte,
+    total: personal + miParte,
+    saldo: pagadoPorMi - miParte
+  };
+}
+
+function pintarResumen() {
+  const r = calcular();
+
+  document.getElementById('total-gastado').textContent = euros(r.total);
+  document.getElementById('valor-personal').textContent = euros(r.personal);
+  document.getElementById('valor-grupal').textContent = euros(r.grupal);
+
+  // Gráfico: el ancho de cada tramo es su porcentaje del total
+  let porcentajePersonal = 0;
+  let porcentajeGrupal = 0;
+  if (r.total > 0) {
+    porcentajePersonal = (r.personal / r.total) * 100;
+    porcentajeGrupal = 100 - porcentajePersonal;
   }
+  document.getElementById('tramo-personal').style.width = porcentajePersonal + '%';
+  document.getElementById('tramo-grupal').style.width = porcentajeGrupal + '%';
 
-  function alEnviar(evento) {
-    evento.preventDefault();
+  // Saldo con el grupo
+  const saldo = document.getElementById('saldo');
+  const etiqueta = document.getElementById('saldo-etiqueta');
+  const valor = document.getElementById('saldo-valor');
 
-    var pago = validar();
-    if (!pago) return;
-
-    pagos.push(pago);
-    pintarResumen();
-    confirmarEnBoton();
-
-    // Deja el formulario listo para el siguiente gasto, manteniendo el tipo
-    inputImporte.value = '';
-    inputConcepto.value = '';
-    casillasMiembros().forEach(function (c) { c.checked = true; });
-    inputImporte.focus();
+  if (r.saldo > 0.005) {
+    saldo.dataset.estado = 'positivo';
+    etiqueta.textContent = 'Te debe el grupo';
+    valor.textContent = euros(r.saldo);
+  } else if (r.saldo < -0.005) {
+    saldo.dataset.estado = 'negativo';
+    etiqueta.textContent = 'Debes al grupo';
+    valor.textContent = euros(-r.saldo);
+  } else {
+    saldo.dataset.estado = 'cero';
+    etiqueta.textContent = 'Estás en paz con el grupo';
+    valor.textContent = euros(0);
   }
+}
 
-  /* ---------- Cabecera con sombra al hacer scroll ---------- */
 
-  function iniciarCabecera() {
-    var cabecera = document.querySelector('.cabecera');
-    if (!cabecera) return;
-    var actualizar = function () {
-      cabecera.classList.toggle('con-sombra', window.scrollY > 8);
-    };
-    window.addEventListener('scroll', actualizar, { passive: true });
-    actualizar();
+/* ---------- 6. Historial de pagos ---------- */
+
+// Crea la tarjeta "Historial" debajo del resumen
+function crearHistorial() {
+  const historial = document.createElement('section');
+  historial.id = 'historial';
+  historial.className = 'tarjeta';
+  historial.innerHTML =
+    '<h3>Historial</h3>' +
+    '<p id="historial-vacio">Todavía no has apuntado ningún pago.</p>' +
+    '<ul id="lista-pagos"></ul>' +
+    '<button id="borrar-todo" class="boton boton-pequeno" type="button">Borrar todo</button>';
+
+  document.getElementById('resumen').after(historial);
+
+  // Un solo "escuchador" para todos los botones "Borrar" de la lista
+  document.getElementById('lista-pagos').addEventListener('click', function (evento) {
+    if (evento.target.classList.contains('boton-borrar')) {
+      borrarPago(Number(evento.target.dataset.id));
+    }
+  });
+
+  document.getElementById('borrar-todo').addEventListener('click', function () {
+    if (confirm('¿Borrar todos los pagos?')) {
+      pagos = [];
+      actualizarTodo();
+    }
+  });
+}
+
+function textoPago(pago) {
+  if (pago.tipo === 'personal') {
+    return pago.concepto + ' · ' + euros(pago.importe) + ' · personal';
   }
+  const quien = pago.pagador === YO ? 'pagaste tú' : 'pagó ' + pago.pagador;
+  return pago.concepto + ' · ' + euros(pago.importe) + ' · ' + quien +
+         ' · entre ' + pago.reparto.length;
+}
 
-  /* ---------- Arranque ---------- */
+function pintarHistorial() {
+  const lista = document.getElementById('lista-pagos');
+  lista.innerHTML = '';
 
-  pintarMiembros();
-  actualizarTipo();
+  // Los más recientes primero
+  pagos.slice().reverse().forEach(function (pago) {
+    const li = document.createElement('li');
+    li.className = 'pago';
+
+    const texto = document.createElement('span');
+    texto.textContent = textoPago(pago);
+
+    const boton = document.createElement('button');
+    boton.type = 'button';
+    boton.className = 'boton-borrar';
+    boton.dataset.id = pago.id;
+    boton.textContent = 'Borrar';
+    boton.setAttribute('aria-label', 'Borrar ' + pago.concepto);
+
+    li.appendChild(texto);
+    li.appendChild(boton);
+    lista.appendChild(li);
+  });
+
+  const hayPagos = pagos.length > 0;
+  document.getElementById('historial-vacio').hidden = hayPagos;
+  document.getElementById('borrar-todo').hidden = !hayPagos;
+}
+
+function borrarPago(id) {
+  pagos = pagos.filter(function (pago) { return pago.id !== id; });
+  actualizarTodo();
+}
+
+
+/* ---------- 7. Guardar los pagos en el navegador ---------- */
+
+// localStorage guarda texto, así que convertimos la lista a JSON y al revés.
+// Va dentro de try/catch porque en modo incógnito puede fallar.
+function guardarPagos() {
+  try {
+    localStorage.setItem(CLAVE_GUARDADO, JSON.stringify(pagos));
+  } catch (error) {
+    // Si no se puede guardar, la demo sigue funcionando igual
+  }
+}
+
+function cargarPagos() {
+  try {
+    const guardado = localStorage.getItem(CLAVE_GUARDADO);
+    return guardado ? JSON.parse(guardado) : [];
+  } catch (error) {
+    return [];
+  }
+}
+
+// Cada vez que cambian los pagos: repintar y guardar
+function actualizarTodo() {
   pintarResumen();
-  iniciarCabecera();
+  pintarHistorial();
+  guardarPagos();
+}
 
-  form.addEventListener('submit', alEnviar);
 
-  form.querySelectorAll('input[name="tipo"]').forEach(function (radio) {
-    radio.addEventListener('change', actualizarTipo);
+/* ---------- 8. Vídeo conceptual ---------- */
+
+// Sustituye el texto de #video-contenedor por el vídeo del proyecto
+function ponerVideo() {
+  const contenedor = document.getElementById('video-contenedor');
+  if (!contenedor) return;
+
+  const video = document.createElement('video');
+  video.src = 'assets/video/cashmates.mp4';
+  video.controls = true;
+  video.preload = 'metadata';
+  video.playsInline = true;
+  video.style.width = '100%';     // que nunca se salga de su caja
+  video.style.maxWidth = '800px';
+
+  contenedor.innerHTML = '';
+  contenedor.appendChild(video);
+}
+
+
+/* ---------- 9. Animaciones al hacer scroll ---------- */
+
+// Las secciones aparecen suavemente cuando entran en pantalla.
+// Las cifras del problema (425 €, +19 %...) cuentan desde 0.
+function iniciarAnimaciones() {
+  // Si el usuario ha pedido menos movimiento en su sistema, no animamos
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if (!('IntersectionObserver' in window)) return;
+
+  const secciones = document.querySelectorAll('main > section');
+  const cifras = document.querySelectorAll('.cifras strong');
+
+  // Estado inicial: invisibles y un poco más abajo.
+  // Solo las que están por debajo de la pantalla; lo que ya se ve, se queda.
+  secciones.forEach(function (seccion) {
+    if (seccion.getBoundingClientRect().top < window.innerHeight) return;
+    seccion.style.opacity = '0';
+    seccion.style.transform = 'translateY(24px)';
+    seccion.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
   });
 
-  // Al corregir un campo, quita el mensaje de error
-  inputImporte.addEventListener('input', function () { inputImporte.setCustomValidity(''); });
-  inputConcepto.addEventListener('input', function () { inputConcepto.setCustomValidity(''); });
-  listaMiembros.addEventListener('change', limpiarErrorReparto);
-})();
+  const observador = new IntersectionObserver(function (entradas) {
+    entradas.forEach(function (entrada) {
+      if (!entrada.isIntersecting) return;
+
+      const elemento = entrada.target;
+      if (elemento.tagName === 'STRONG') {
+        animarCifra(elemento);
+      } else {
+        elemento.style.opacity = '1';
+        elemento.style.transform = 'none';
+      }
+      observador.unobserve(elemento); // solo se anima una vez
+    });
+  }, { threshold: 0.15 });
+
+  secciones.forEach(function (s) { observador.observe(s); });
+  cifras.forEach(function (c) { observador.observe(c); });
+}
+
+// "425 €/mes" -> cuenta de 0 a 425 manteniendo el resto del texto
+function animarCifra(elemento) {
+  const textoFinal = elemento.textContent;
+  const numero = textoFinal.match(/\d+/);
+  if (!numero) return;
+
+  const objetivo = Number(numero[0]);
+  const duracion = 1200; // milisegundos
+  const inicio = performance.now();
+
+  function paso(ahora) {
+    const progreso = Math.min((ahora - inicio) / duracion, 1);
+    const valor = Math.round(objetivo * progreso);
+    elemento.textContent = textoFinal.replace(numero[0], valor);
+    if (progreso < 1) requestAnimationFrame(paso);
+  }
+  requestAnimationFrame(paso);
+}
+
+// Sombra en la cabecera cuando la página no está arriba del todo
+function iniciarCabecera() {
+  const cabecera = document.querySelector('.cabecera');
+  window.addEventListener('scroll', function () {
+    cabecera.classList.toggle('con-sombra', window.scrollY > 8);
+  });
+}
+
+
+/* ---------- 10. Arranque ---------- */
+
+crearSelectorPagador();
+crearCasillasMiembros();
+crearHistorial();
+actualizarTipo();
+actualizarTodo();
+ponerVideo();
+iniciarAnimaciones();
+iniciarCabecera();
+
+form.addEventListener('submit', alEnviarFormulario);
+form.querySelectorAll('input[name="tipo"]').forEach(function (radio) {
+  radio.addEventListener('change', actualizarTipo);
+});
