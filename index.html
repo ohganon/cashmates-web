@@ -4,7 +4,11 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>CashMates · Split bills, not friendships</title>
-  <meta name="description" content="Apunta los gastos del piso, separa lo común de lo personal y mira cuánto te deben. Gratis y sin conectar tu banco.">
+  <meta name="description" content="Apunta tus gastos y los de tu grupo, separa lo común de lo personal y mira cuánto te deben. Gratis y sin conectar tu banco.">
+  <!-- Icono de la pestaña (las dos caritas del logo) -->
+  <link rel="icon" type="image/svg+xml" href="assets/icono/favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/icono/favicon-32.png">
+  <link rel="apple-touch-icon" href="assets/icono/apple-touch-icon.png">
   <link rel="stylesheet" href="estilos.css">
   <script src="app.js" defer></script>
 </head>
@@ -12,76 +16,124 @@
 
   <header class="cabecera">
     <a class="logo" href="#inicio">cashmates</a>
-    <a class="boton boton-pequeno" href="#demo">Probar</a>
   </header>
 
   <main>
 
     <!-- PORTADA: nombre, eslogan y frase de valor -->
     <section id="inicio" class="portada">
-      <img class="logo_animado" src="assets/img/logo_caras.gif" alt="Logo Cashmates">
-      <img class="nombre" src="assets/img/cashmates.png" alt="cashmates">
-      <img class="eslogan" src="assets/img/eslogan.png" alt="eslogan">
-      <p>Apunta lo que pagas, separa lo común de lo personal y mira al momento cuánto te deben.</p>
-      <a class="boton" href="#demo">Pruébalo gratis</a>
-    </section>
+      <img class="portada-gif" src="assets/img/equipo-app-ligero.gif" alt="Un grupo de amigos usando CashMates">
 
-    <!-- PROBLEMA: datos del Sprint 1 -->
-    <section id="problema" class="seccion">
-      <h2>Pagar ya es fácil. Llevar las cuentas, no.</h2>
-      <ol class="pasos">
-        <li>Uno paga el alquiler, la luz o la cena y el resto le devuelve su parte por Bizum.</li>
-        <li>Las deudas acaban en las notas del móvil, en WhatsApp o de memoria.</li>
-        <li>Al final se olvidan y aparecen los malentendidos.</li>
-      </ol>
-      <ul class="cifras">
-        <li>
-          <strong>425 €/mes</strong>
-          <span>precio medio de una habitación en 2025</span>
-        </li>
-        <li>
-          <strong>+19 %</strong>
-          <span>ofertas de pisos compartidos en 2025</span>
-        </li>
-        <li>
-          <strong>1 de cada 2</strong>
-          <span>comparte piso porque no puede pagarlo solo</span>
-        </li>
-      </ul>
-      <p class="fuentes">Fuentes: idealista (2025), Fotocasa vía Forbes, bunq (2025).</p>
-    </section>
-
-    <!-- SOLUCIÓN: beneficios, sin tecnicismos -->
-    <section id="solucion" class="seccion">
-      <h2>Todo en un solo sitio, y gratis</h2>
-      <ul class="tarjetas">
-        <li>
-          <h3>Apunta en segundos</h3>
-          <p>Quién ha pagado, cuánto y entre quiénes se reparte.</p>
-        </li>
-        <li>
-          <h3>Lo tuyo es tuyo</h3>
-          <p>Tus gastos personales no los ve nadie del grupo.</p>
-        </li>
-        <li>
-          <h3>Cuentas claras</h3>
-          <p>Ves cuánto has gastado y cuánto te debe el piso.</p>
-        </li>
-      </ul>
-      <p class="nota">CashMates no mueve dinero ni se conecta a tu banco. Los pagos siguen por Bizum.</p>
-    </section>
-
-    <!-- VÍDEO CONCEPTUAL: sustituir el contenido de #video-contenedor por el iframe del vídeo -->
-    <section id="video" class="seccion">
-      <h2>Mira cómo funciona</h2>
-      <div id="video-contenedor" class="video">
-        <p>Vídeo conceptual de 1 minuto</p>
+      <div class="portada-texto">
+        <img class="logo_animado" src="assets/img/logo_caras.gif" alt="Logo Cashmates">
+        <img class="nombre" src="assets/img/cashmates.png" alt="cashmates">
+        <img class="eslogan" src="assets/img/eslogan.png" alt="Split bills, not friendships.">
+        <p class="intro">Apunta lo que pagas, separa lo común de lo personal y mira al momento cuánto te deben.</p>
+        <a class="boton" href="#demo">Pruébalo gratis</a>
       </div>
+    </section>
+
+    <!-- TU DINERO: finanzas personales (texto a la izquierda, GIF a la derecha) -->
+    <section id="personal" class="seccion fila">
+      <div class="fila_texto">
+        <p class="antetitulo">Tus finanzas</p>
+        <h2>Tu dinero, bajo control</h2>
+        <p class="entradilla">Apunta tus gastos del día a día y mira al momento cuánto llevas gastado este mes. Sin hojas de cálculo y sin conectar tu banco.</p>
+        <ul class="ventajas">
+          <li><strong>Todo tu gasto de un vistazo.</strong> Lo tuyo y tu parte de lo común, sumados en un solo número.</li>
+          <li><strong>Lo personal, aparte de lo compartido.</strong> El modelo que prefiere el 42 % de las parejas.</li>
+          <li><strong>Privado de verdad.</strong> Tus gastos personales no los ve nadie del grupo.</li>
+        </ul>
+      </div>
+      <img class="personajegif" src="assets/img/personal.gif" alt="Una chica revisa en el móvil cuánto ha gastado este mes">
+    </section>
+
+    <!-- PROBLEMA: gastos en grupo (GIF a la izquierda, texto a la derecha, cifras debajo) -->
+    <section id="problema" class="seccion fila">
+      <img class="personajegif" src="assets/img/camelo.gif" alt="Un chico hecho un lío con quién debe qué en su grupo">
+      <div class="fila_texto">
+        <p class="antetitulo">En grupo</p>
+        <h2>Pagar ya es fácil. Llevar las cuentas del grupo, no.</h2>
+        <ol class="pasos">
+          <li>Uno paga la cena, el viaje o la luz y el resto le devuelve su parte por Bizum.</li>
+          <li>Las deudas acaban en las notas del móvil, en WhatsApp o de memoria.</li>
+          <li>Se olvidan, a nadie le apetece sacar el tema y aparecen los malentendidos.</li>
+        </ol>
+      </div>
+      <div class="datos">
+        <ul class="cifras">
+          <li>
+            <strong>30,6 millones</strong>
+            <span>de usuarios de Bizum se pasan dinero entre particulares</span>
+          </li>
+          <li>
+            <strong>60 %</strong>
+            <span>de los españoles discute con su pareja por dinero</span>
+          </li>
+          <li>
+            <strong>8 de cada 10</strong>
+            <span>parejas comparten dinero</span>
+          </li>
+        </ul>
+        <p class="fuentes">Fuentes: Bizum (2025), bunq (2025).</p>
+      </div>
+    </section>
+
+    <!-- SOLUCIÓN: las cuentas del grupo (texto a la izquierda, GIF a la derecha) -->
+    <section id="solucion" class="seccion fila">
+      <div class="fila_texto">
+        <p class="antetitulo">En grupo</p>
+        <h2>Las cuentas del grupo, claras y gratis</h2>
+        <ul class="tarjetas">
+          <li>
+            <h3>Apunta en segundos</h3>
+            <p>Quién ha pagado, cuánto y entre quiénes se reparte.</p>
+          </li>
+          <li>
+            <h3>Saldos al momento</h3>
+            <p>Ves quién debe a quién y cuánto, sin hacer cuentas.</p>
+          </li>
+          <li>
+            <h3>Historial compartido</h3>
+            <p>Todos los gastos del grupo a la vista, para que no haya malentendidos.</p>
+          </li>
+        </ul>
+        <p class="nota">CashMates no mueve dinero ni se conecta a tu banco: solo apunta y calcula. Los pagos siguen por Bizum.</p>
+      </div>
+      <img class="personajegif" src="assets/img/solucion.gif" alt="Un chico explica cómo funcionan las cuentas del grupo">
+    </section>
+
+    <!-- PARA QUIÉN: cualquier grupo (GIF a la izquierda, texto a la derecha) -->
+    <section id="grupos" class="seccion fila">
+      <img class="personajegif" src="assets/img/grupos.gif" alt="Dos amigos usan CashMates en distintos grupos">
+      <div class="fila_texto">
+        <p class="antetitulo">Para quién</p>
+        <h2>Para cualquier grupo que comparta gastos</h2>
+        <ul class="etiquetas">
+          <li><strong>Piso compartido</strong> El wifi, la luz, la limpieza y la compra del mes.</li>
+          <li><strong>Pareja</strong> Lo común a medias y lo de cada uno, aparte.</li>
+          <li><strong>Viaje</strong> Alojamiento, gasolina y cenas; al volver, cada uno sabe lo que debe.</li>
+          <li><strong>Amigos</strong> Una cena, un regalo o una actividad, saldado al final.</li>
+        </ul>
+        <p class="entradilla">Gratis y sin límite de gastos al día.</p>
+      </div>
+    </section>
+
+    <!-- VÍDEO CONCEPTUAL: el JS pone el vídeo dentro de #video-contenedor (texto y vídeo a la izquierda, GIF a la derecha) -->
+    <section id="video" class="seccion fila">
+      <div class="fila_texto">
+        <h2>Mira cómo funciona</h2>
+        <p class="entradilla">En un minuto: cómo apuntar un gasto y ver al momento quién debe a quién.</p>
+        <div id="video-contenedor" class="video">
+          <p>Vídeo conceptual de 1 minuto</p>
+        </div>
+      </div>
+      <img class="personajegif" src="assets/img/video.gif" alt="Un chico señala el vídeo de CashMates">
     </section>
 
     <!-- LLAMADA A LA ACCIÓN -->
     <section id="llamada" class="seccion llamada">
-      <h2>Tu piso, sin discusiones por dinero</h2>
+      <h2>Tu grupo, sin discusiones por dinero</h2>
       <p>Apunta tu primer gasto ahora.</p>
       <a class="boton" href="#demo">Empezar</a>
     </section>

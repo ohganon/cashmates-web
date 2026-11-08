@@ -1,0 +1,429 @@
+/* ===== Fuentes ===== */
+@font-face {
+  font-family: 'Nunito';
+  src: url('assets/fuentes/Nunito-SemiBold.woff2') format('woff2');
+  font-weight: 600;
+}
+@font-face {
+  font-family: 'Nunito';
+  src: url('assets/fuentes/Nunito-ExtraBold.woff2') format('woff2');
+  font-weight: 800;
+}
+
+/* ===== Base ===== */
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 600;
+  color: #3C3C3C;
+  background: #FFFFFF;
+}
+
+input, button { font: inherit; }
+
+/* Lo que el JS oculta con "hidden" tiene que ocultarse aunque tenga otra clase (p. ej. .boton) */
+[hidden] { display: none !important; }
+
+/* ===== Cabecera ===== */
+.cabecera {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px 32px;
+}
+
+.logo {
+  font-weight: 800;
+  font-size: 24px;
+  color: #0F3D35;
+  text-decoration: none;
+}
+
+/* ===== Portada: GIF a la izquierda, logo y texto a la derecha ===== */
+.portada {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);   /* la columna del GIF es más ancha */
+  align-items: center;
+  gap: 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px 32px 48px;
+  min-height: calc(100vh - 80px);
+}
+
+.portada-gif {
+  width: 100%;
+  height: auto;
+}
+
+.portada-texto {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 10px;
+}
+
+.logo_animado {
+  width: 150px;
+  height: auto;
+}
+
+.nombre {
+  width: 100%;
+  max-width: 360px;
+  height: auto;
+}
+
+.eslogan {
+  width: 100%;
+  max-width: 290px;
+  height: auto;
+  margin-bottom: 14px;
+}
+
+.intro {
+  font-size: 1.15rem;
+  max-width: 400px;
+  margin: 0 0 14px;
+}
+
+/* ===== Botones ===== */
+.boton {
+  display: inline-block;
+  background: #12A091;
+  color: #fff;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  text-decoration: none;
+  padding: 14px 32px;
+  border: none;
+  border-radius: 16px;
+  box-shadow: 0 4px 0 #0E7D71;
+  cursor: pointer;
+  transition: background .2s;
+}
+
+.boton:hover { background: #2BC4AE; }
+
+.boton:active {
+  transform: translateY(4px);
+  box-shadow: none;
+}
+
+.boton-pequeno {
+  padding: 10px 20px;
+  font-size: 14px;
+}
+
+/* ===== Secciones: estructura común ===== */
+/* El fondo ocupa todo el ancho, pero el contenido no pasa de 1100px:
+   el relleno lateral crece lo que haga falta para centrarlo. */
+.seccion {
+  --fondo: #FFFFFF;                    /* color de la sección */
+  --antes: var(--fondo);               /* color de la sección anterior */
+  --fundido: 80px;                     /* altura de la transición entre colores */
+  padding: 80px max(32px, calc((100% - 1100px) / 2));
+  /* Transición: arriba empieza con el color de la sección anterior y se funde con el suyo */
+  background: linear-gradient(var(--antes) 0, var(--fondo) var(--fundido));
+}
+
+.seccion h2 {
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  line-height: 1.15;
+  font-weight: 800;
+  color: #0F3D35;
+  margin: 0 0 24px;
+}
+
+/* Colores de cada sección (y de la anterior, para la transición), en el orden de la página */
+#personal { --fondo: #F4EFFF; --antes: #FFFFFF; }
+#problema { --fondo: #FFF6EA; --antes: #F4EFFF; }
+#solucion { --fondo: #EAF7F3; --antes: #FFF6EA; }
+#grupos   { --fondo: #EAF4FD; --antes: #EAF7F3; }
+#video    { --fondo: #FFFFFF; --antes: #EAF4FD; }
+#llamada  { --fondo: #0F3D35; --antes: #FFFFFF; --fundido: 36px; }   /* de claro a oscuro: fundido corto, si no queda turbio */
+#demo     { --fondo: #F5F7F6; --antes: #0F3D35; --fundido: 36px; }
+
+/* ===== Filas: texto y GIF lado a lado ===== */
+/* El orden lo marca el HTML: si el GIF va primero, sale a la izquierda */
+.fila {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+  column-gap: 56px;
+  row-gap: 40px;
+}
+
+.personajegif {
+  width: 100%;
+  max-width: 400px;
+  height: auto;
+  justify-self: center;
+}
+
+/* Etiqueta pequeña encima del título ("Tus finanzas", "En grupo"...) */
+.antetitulo {
+  display: inline-block;
+  margin: 0 0 12px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: #FFFFFF;
+  color: #12A091;
+  font-size: .8rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.entradilla {
+  font-size: 1.15rem;
+  line-height: 1.55;
+  margin: 0 0 22px;
+}
+
+/* ===== Tu dinero: lista con checks morados ===== */
+#personal .antetitulo { color: #7656C2; }
+
+.ventajas {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 14px;
+}
+
+.ventajas li {
+  position: relative;
+  padding-left: 40px;
+  line-height: 1.5;
+}
+
+.ventajas li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #7656C2;
+  color: #FFFFFF;
+  font-weight: 800;
+  font-size: .9rem;
+}
+
+.ventajas strong { color: #0F3D35; }
+
+/* ===== Vídeo ===== */
+.video video {
+  display: block;
+  border-radius: 18px;
+  background: #0F3D35;
+  box-shadow: 0 6px 0 #E5E5E5;
+}
+
+/* ===== Problema: lista numerada y cifras debajo ===== */
+#problema .antetitulo,
+#solucion .antetitulo { color: #E0902A; }
+#solucion .antetitulo { color: #12A091; }
+
+.pasos {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  counter-reset: paso;                 /* crea un contador que empieza en 0 */
+}
+
+.pasos li {
+  counter-increment: paso;             /* le suma 1 en cada punto */
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  font-size: 1.1rem;
+  line-height: 1.5;
+  margin-bottom: 16px;
+}
+
+.pasos li::before {
+  content: counter(paso);              /* escribe el número dentro del círculo */
+  flex: 0 0 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #12A091;
+  color: #fff;
+  font-weight: 800;
+}
+
+/* Las cifras ocupan las dos columnas, debajo */
+.datos { grid-column: 1 / -1; }
+
+.cifras {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.cifras li {
+  background: #FFFFFF;
+  border: 2px solid #F0E2CF;
+  border-bottom-width: 5px;            /* borde de abajo más gordo: efecto Duolingo */
+  border-radius: 18px;
+  padding: 26px 20px;
+  text-align: center;
+}
+
+.cifras strong {
+  display: block;
+  font-size: 2.2rem;
+  font-weight: 800;
+  line-height: 1.1;
+  margin-bottom: 8px;
+}
+
+.cifras li:nth-child(1) strong { color: #F0A838; }
+.cifras li:nth-child(2) strong { color: #12A091; }
+.cifras li:nth-child(3) strong { color: #A970FF; }
+
+.cifras span { color: #6B7A75; }
+
+.fuentes {
+  font-size: .85rem;
+  color: #9A8F80;
+  text-align: center;
+  margin: 18px 0 0;
+}
+
+/* ===== Solución: tarjetas con un círculo a juego con los iconos del GIF ===== */
+.tarjetas {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 14px;
+}
+
+.tarjetas li {
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  column-gap: 16px;
+  align-items: center;
+  background: #FFFFFF;
+  border: 2px solid #CFE7DF;
+  border-bottom-width: 5px;
+  border-radius: 18px;
+  padding: 16px 20px;
+}
+
+.tarjetas li::before {
+  content: "";
+  grid-row: span 2;                    /* el círculo ocupa la altura del título y el texto */
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+.tarjetas li:nth-child(1)::before { background: #4CC764; }
+.tarjetas li:nth-child(2)::before { background: #F0A838; }
+.tarjetas li:nth-child(3)::before { background: #12A091; }
+
+.tarjetas h3 {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #0F3D35;
+}
+
+.tarjetas p {
+  margin: 2px 0 0;
+  color: #5E6E69;
+}
+
+.nota {
+  margin: 20px 0 0;
+  padding: 12px 16px;
+  background: #FFFFFF;
+  border-left: 5px solid #12A091;
+  border-radius: 10px;
+  font-size: .95rem;
+  color: #3C3C3C;
+}
+
+/* ===== Para quién: un tipo de grupo por línea, con su color (como en el GIF) ===== */
+#grupos .antetitulo { color: #1C8AD6; }
+
+.etiquetas {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 22px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.etiquetas li {
+  background: #FFFFFF;
+  border: 2px solid #CFE2F2;
+  border-bottom-width: 5px;
+  border-radius: 16px;
+  padding: 14px 16px;
+  color: #5E6E69;
+  font-size: .95rem;
+  line-height: 1.45;
+}
+
+.etiquetas strong {
+  display: block;
+  font-size: 1.05rem;
+  margin-bottom: 4px;
+}
+
+.etiquetas li:nth-child(1) strong { color: #3BA552; }
+.etiquetas li:nth-child(2) strong { color: #E8604F; }
+.etiquetas li:nth-child(3) strong { color: #1C8AD6; }
+.etiquetas li:nth-child(4) strong { color: #8E5BE0; }
+
+#grupos .entradilla { font-weight: 800; color: #0F3D35; margin: 0; }
+
+/* ===== Llamada a la acción: banda verde oscura ===== */
+.llamada {
+  text-align: center;
+  color: #FFFFFF;
+}
+
+.llamada h2 { color: #FFFFFF; }
+
+.llamada p {
+  font-size: 1.15rem;
+  margin: 0 0 24px;
+  color: #CFEFE7;
+}
+
+/* ===== Móvil: una sola columna ===== */
+@media (max-width: 800px) {
+  .portada {
+    grid-template-columns: minmax(0, 1fr);
+    min-height: auto;
+    gap: 24px;
+  }
+  .portada-texto { order: -1; }
+
+  .seccion { --fundido: 56px; padding-top: 56px; padding-bottom: 56px; }
+  .fila { grid-template-columns: minmax(0, 1fr); row-gap: 32px; }
+  .fila .personajegif { order: 2; max-width: 300px; }   /* primero el texto y luego el GIF */
+  .datos { order: 3; }
+  .cifras { grid-template-columns: minmax(0, 1fr); }
+  .etiquetas { grid-template-columns: minmax(0, 1fr); }
+}
