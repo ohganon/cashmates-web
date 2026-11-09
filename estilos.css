@@ -21,7 +21,7 @@ body {
   background: #FFFFFF;
 }
 
-input, button { font: inherit; }
+input, button, select { font: inherit; }
 
 /* Lo que el JS oculta con "hidden" tiene que ocultarse aunque tenga otra clase (p. ej. .boton) */
 [hidden] { display: none !important; }
@@ -411,6 +411,314 @@ input, button { font: inherit; }
   color: #CFEFE7;
 }
 
+/* ===== Demo: formulario a la izquierda, resumen e historial a la derecha ===== */
+.demo {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  align-items: start;
+  gap: 24px 32px;
+}
+
+.demo h2 {
+  grid-column: 1 / -1;
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+#form-pago  { grid-row: 2 / span 2; }   /* el formulario ocupa la altura del resumen y el historial */
+#resumen    { grid-column: 2; }
+#historial  { grid-column: 2; }
+
+/* Tarjeta blanca con el borde de abajo más gordo, como el resto de la web */
+.tarjeta {
+  background: #FFFFFF;
+  border: 2px solid #E2E8E5;
+  border-bottom-width: 5px;
+  border-radius: 20px;
+  padding: 24px;
+}
+
+.tarjeta h3 {
+  margin: 0 0 16px;
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #0F3D35;
+}
+
+/* --- Formulario --- */
+.formulario {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.formulario > label,
+#campo-pagador label,
+#bloque-reparto legend {
+  margin-top: 12px;
+  font-size: .9rem;
+  font-weight: 800;
+  color: #6B7A75;
+}
+
+.formulario input[type="number"],
+.formulario input[type="text"],
+.formulario select {
+  width: 100%;
+  padding: 12px 14px;
+  border: 2px solid #D5DEDA;
+  border-radius: 12px;
+  background: #FFFFFF;
+  color: #3C3C3C;
+  font: inherit;
+}
+
+.formulario input:focus,
+.formulario select:focus {
+  outline: none;
+  border-color: #12A091;
+  box-shadow: 0 0 0 3px #CFEFE7;
+}
+
+fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+
+legend { padding: 0; }
+
+#campo-pagador {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Grupal / Personal: dos botones pegados, el elegido en verde */
+.selector-tipo {
+  display: flex;
+  background: #EEF2F1;
+  border-radius: 14px;
+  padding: 4px;
+}
+
+.selector-tipo legend {                 /* el título solo lo leen los lectores de pantalla */
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+.selector-tipo label { flex: 1; }
+
+.selector-tipo span {
+  display: block;
+  text-align: center;
+  padding: 10px;
+  border-radius: 10px;
+  font-weight: 800;
+  color: #6B7A75;
+  cursor: pointer;
+  transition: background .2s, color .2s;
+}
+
+.selector-tipo input:checked + span {
+  background: #12A091;
+  color: #FFFFFF;
+}
+
+/* Las casillas reales se esconden, pero siguen ahí (el JS las usa para avisar de errores) */
+.selector-tipo input,
+.miembro input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.selector-tipo input:focus-visible + span,
+.miembro input:focus-visible + span {
+  outline: 3px solid #CFEFE7;
+}
+
+/* Personas del reparto: chapitas que se marcan en verde */
+.miembros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.miembro span {
+  display: inline-block;
+  padding: 8px 16px;
+  border: 2px solid #D5DEDA;
+  border-radius: 999px;
+  color: #6B7A75;
+  cursor: pointer;
+  transition: background .2s, border-color .2s, color .2s;
+}
+
+.miembro input:checked + span {
+  background: #E3F4EF;
+  border-color: #12A091;
+  color: #0E7D71;
+}
+
+/* Una carita de un color por persona, como en el vídeo (el orden es el de MIEMBROS en app.js) */
+.miembro span::before {
+  content: "";
+  display: inline-block;
+  width: 22px;
+  height: 22px;
+  margin-right: 8px;
+  vertical-align: -5px;
+  background: center / contain no-repeat;
+}
+
+.miembro:nth-child(1) span::before { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Ccircle cx='20' cy='20' r='20' fill='%23F1A83A'/%3E%3Ccircle cx='14' cy='16' r='2.6' fill='%230F3D35'/%3E%3Ccircle cx='26' cy='16' r='2.6' fill='%230F3D35'/%3E%3Cpath d='M12 23 Q20 31 28 23' fill='none' stroke='%230F3D35' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E"); }
+.miembro:nth-child(2) span::before { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Ccircle cx='20' cy='20' r='20' fill='%2314A194'/%3E%3Ccircle cx='14' cy='16' r='2.6' fill='%230F3D35'/%3E%3Ccircle cx='26' cy='16' r='2.6' fill='%230F3D35'/%3E%3Cpath d='M12 23 Q20 31 28 23' fill='none' stroke='%230F3D35' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E"); }
+.miembro:nth-child(3) span::before { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Ccircle cx='20' cy='20' r='20' fill='%23ED6E5C'/%3E%3Ccircle cx='14' cy='16' r='2.6' fill='%230F3D35'/%3E%3Ccircle cx='26' cy='16' r='2.6' fill='%230F3D35'/%3E%3Cpath d='M12 23 Q20 31 28 23' fill='none' stroke='%230F3D35' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E"); }
+.miembro:nth-child(4) span::before { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Ccircle cx='20' cy='20' r='20' fill='%237B6CF0'/%3E%3Ccircle cx='14' cy='16' r='2.6' fill='%230F3D35'/%3E%3Ccircle cx='26' cy='16' r='2.6' fill='%230F3D35'/%3E%3Cpath d='M12 23 Q20 31 28 23' fill='none' stroke='%230F3D35' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E"); }
+
+/* Quien no entra en el reparto se queda en gris */
+.miembro input:not(:checked) + span::before { filter: grayscale(1); opacity: .5; }
+
+#boton-anadir {
+  width: 100%;
+  margin-top: 18px;
+}
+
+/* Durante 1,5 s después de añadir un pago */
+#boton-anadir.anadido {
+  background: #4CC764;
+  box-shadow: 0 4px 0 #3BA552;
+}
+
+/* --- Resumen: total, barra y saldo --- */
+#titulo-resumen {
+  margin-bottom: 4px;
+  color: #6B7A75;
+  font-size: 1rem;
+}
+
+.cifra-grande {
+  margin: 0 0 14px;
+  font-size: 2.8rem;
+  font-weight: 800;
+  line-height: 1.1;
+  color: #0F3D35;
+}
+
+.grafico {
+  display: flex;
+  height: 18px;
+  border-radius: 999px;
+  background: #EEF2F1;
+  overflow: hidden;
+}
+
+.tramo { transition: width .4s ease; }
+.tramo-personal { background: #F0A838; }
+.tramo-grupal   { background: #12A091; }
+
+.leyenda {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 22px;
+  padding: 0;
+  margin: 14px 0 18px;
+  font-size: .95rem;
+}
+
+.leyenda li::before {
+  content: "";
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  margin-right: 8px;
+  border-radius: 50%;
+}
+
+.leyenda-personal::before { background: #F0A838; }
+.leyenda-grupal::before   { background: #12A091; }
+
+.saldo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  padding: 14px 18px;
+  border-radius: 16px;
+  background: #EEF2F1;
+  color: #6B7A75;
+  font-weight: 800;
+}
+
+.saldo strong { font-size: 1.5rem; }
+
+.saldo[data-estado="positivo"] { background: #DDF3EC; color: #0E7D71; }
+.saldo[data-estado="negativo"] { background: #FDE8E4; color: #C4483A; }
+
+/* --- Historial --- */
+#historial-vacio {
+  margin: 0;
+  color: #6B7A75;
+}
+
+#lista-pagos {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.pago {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 2px solid #EEF2F1;
+  font-size: .95rem;
+}
+
+.boton-borrar {
+  flex-shrink: 0;
+  background: none;
+  border: 0;
+  padding: 4px 0;
+  color: #C4483A;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.boton-borrar:hover { text-decoration: underline; }
+
+/* "Borrar todo" en rojo suave para que no parezca la acción principal */
+#borrar-todo {
+  margin-top: 16px;
+  background: #FFFFFF;
+  color: #C4483A;
+  border: 2px solid #F3C9C2;
+  box-shadow: 0 3px 0 #F3C9C2;
+}
+
+#borrar-todo:hover { background: #FDF1EF; }
+
+/* ===== Pie ===== */
+.pie {
+  background: #0F3D35;
+  color: #CFEFE7;
+  text-align: center;
+  padding: 28px 32px;
+  font-size: .95rem;
+}
+
+.pie p { margin: 0; }
+
 /* ===== Móvil: una sola columna ===== */
 @media (max-width: 800px) {
   .portada {
@@ -426,4 +734,7 @@ input, button { font: inherit; }
   .datos { order: 3; }
   .cifras { grid-template-columns: minmax(0, 1fr); }
   .etiquetas { grid-template-columns: minmax(0, 1fr); }
+
+  .demo { grid-template-columns: minmax(0, 1fr); }
+  #form-pago, #resumen, #historial { grid-column: 1; grid-row: auto; }
 }
