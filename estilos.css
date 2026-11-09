@@ -116,6 +116,25 @@ input, button, select { font: inherit; }
   box-shadow: none;
 }
 
+/* Dos botones juntos (portada) */
+.botones {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+
+/* Botón con borde, para que no compita con el principal.
+   El relleno es 2px menor para que mida lo mismo que .boton con el borde */
+.boton-secundario {
+  background: #FFFFFF;
+  color: #12A091;
+  border: 2px solid #12A091;
+  padding: 12px 30px;
+}
+
+.boton-secundario:hover { background: #E3F4EF; }
+
 .boton-pequeno {
   padding: 10px 20px;
   font-size: 14px;
