@@ -194,11 +194,6 @@ function crearSelect(id, opciones) {
   return select;
 }
 
-// "Tú" necesita otras palabras: "te debe", "debes"...
-function quien(nombre) {
-  return nombre === YO ? 'tú' : nombre;
-}
-
 // Mensaje flotante abajo a la derecha que desaparece solo
 function mostrarMensaje(texto) {
   let zona = document.getElementById('mensajes');
@@ -952,7 +947,10 @@ function crearHistorial() {
 
 function textoPago(pago) {
   if (pago.tipo === 'saldado') {
-    return '✅ ' + pago.pagador + ' pagó ' + euros(pago.importe) + ' a ' + quien(pago.reparto[0]) + ' por Bizum';
+    const para = pago.reparto[0];
+    if (para === YO) return '✅ ' + pago.pagador + ' te pagó ' + euros(pago.importe) + ' por Bizum';
+    if (pago.pagador === YO) return '✅ Pagaste ' + euros(pago.importe) + ' a ' + para + ' por Bizum';
+    return '✅ ' + pago.pagador + ' pagó ' + euros(pago.importe) + ' a ' + para + ' por Bizum';
   }
   let texto = '[' + pago.etiqueta + '] ' + pago.concepto + ' · ' + euros(pago.importe);
   if (pago.tipo === 'personal') return texto + ' · personal';
