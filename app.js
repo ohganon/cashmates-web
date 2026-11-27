@@ -15,9 +15,10 @@
     11. Gastos programados (recurrentes)
     12. Meta de ahorro común
     13. Historial con filtro por etiqueta
-    14. Repintar todo
-    15. Vídeo, animaciones y cabecera (lo de la web)
-    16. Arranque
+    14. Turnos de compra (papel higiénico, detergente...)
+    15. Repintar todo
+    16. Vídeo, animaciones y cabecera (lo de la web)
+    17. Arranque
 
    Cómo se calcula el dinero:
    - Balance de cada persona = lo que ha pagado por el grupo - su parte.
@@ -29,6 +30,8 @@
    - Moroso: quien debe en total DEUDA_GRANDE € o más.
    - Urgente: si un pago se marca como urgente, se insiste a quienes
      tienen que pagarlo hasta que dejan de deber.
+   - Turnos: lo básico del piso no se reparte; lo compra cada vez uno,
+     siguiendo el orden de la gente del grupo.
 
    CashMates no mueve dinero: aquí solo se apuntan gastos.
    ========================================================================= */
@@ -60,6 +63,7 @@ function crearGrupo(nombre, miembros) {
     miembros: miembros,
     pagos: [],         // gastos, pagos personales y deudas saldadas
     recurrentes: [],   // gastos que se repiten cada mes
+    turnos: [],        // { id, cosa, indice } -> le toca a miembros[indice]
     meta: null         // { nombre, objetivo, aportaciones: [{ quien, importe }] }
   };
 }
@@ -82,6 +86,14 @@ function datosEjemplo() {
   piso.recurrentes = [
     { id: 1, importe: 40, concepto: 'Wifi', etiqueta: 'Suscripciones',
       pagador: YO, reparto: todos, dia: new Date().getDate(), ultimoMes: mesActual() }
+  ];
+
+  // Turnos: el número es la posición en la lista de miembros
+  // (0 = Tú, 1 = Lucía, 2 = Pablo, 3 = Marta)
+  piso.turnos = [
+    { id: 2, cosa: 'Papel higiénico', indice: 2 },
+    { id: 3, cosa: 'Detergente y lavavajillas', indice: 3 },
+    { id: 4, cosa: 'Bolsas de basura', indice: 0 }
   ];
 
   piso.meta = {
@@ -140,6 +152,8 @@ function cargarDatos() {
   try {
     const guardado = JSON.parse(localStorage.getItem(CLAVE_GUARDADO));
     if (guardado && guardado.grupos && guardado.grupos[guardado.grupoActivo]) {
+      // Datos guardados con una versión anterior de la demo: sin turnos
+      Object.values(guardado.grupos).forEach(function (g) { g.turnos = g.turnos || []; });
       return guardado;
     }
   } catch (error) {
@@ -596,7 +610,18 @@ function pintarDeudas() {
     lista.appendChild(li);
   });
 
-  document.getElementById('deudas-vacio').hidden = deudas.length > 0;
+  // Sin deudas: si ya hay gastos del grupo, es el momento de éxito
+  const vacio = document.getElementById('deudas-vacio');
+  const hayGastos = grupo().pagos.some(function (p) { return p.tipo === 'grupal'; });
+  const enPaz = hayGastos && deudas.length === 0;
+  vacio.hidden = deudas.length > 0;
+  vacio.textContent = enPaz ? '🎉 ' + textoEnPaz() : 'Todavía no hay gastos del grupo.';
+  document.getElementById('deudas').classList.toggle('en-paz', enPaz);
+}
+
+// "¡Piso en paz! Nadie debe nada." (o "¡Grupo en paz!" en la pareja y el viaje)
+function textoEnPaz() {
+  return '¡' + (datos.grupoActivo === 'piso' ? 'Piso' : 'Grupo') + ' en paz! Nadie debe nada.';
 }
 
 // Apunta que "de" ha pagado su deuda a "para" (por Bizum, fuera de la app)
@@ -614,6 +639,11 @@ function saldarDeuda(de, para, importe) {
 
   actualizarTodo();
   mostrarMensaje('Saldado: ' + de + ' → ' + para + ' (' + euros(importe) + ' por Bizum).');
+
+  // ¿Era la última deuda? Momento de éxito
+  if (calcularDeudas(calcularBalances(grupo())).length === 0) {
+    mostrarMensaje('🎉 ' + textoEnPaz());
+  }
 }
 
 
@@ -695,7 +725,15 @@ function pintarAvisos() {
     lista.appendChild(li);
   });
 
-  document.getElementById('avisos-vacio').hidden = avisos.length > 0;
+  // Recordatorio de los turnos que te tocan a ti
+  const misTurnos = grupo().turnos.filter(function (t) { return aQuienLeToca(t) === YO; });
+  misTurnos.forEach(function (turno) {
+    lista.appendChild(crear('li', 'pago aviso', '🛒 Te toca comprar: ' + turno.cosa.toLowerCase() + '.'));
+  });
+
+  const vacio = document.getElementById('avisos-vacio');
+  vacio.hidden = avisos.length + misTurnos.length > 0;
+  vacio.textContent = 'No hay deudas grandes ni urgentes.';
 
   // El botón de notificaciones solo sale si aún no se han activado
   const yaActivadas = 'Notification' in window && Notification.permission === 'granted';
@@ -997,7 +1035,107 @@ function borrarPago(id) {
 }
 
 
-/* ---------- 14. Repintar todo ---------- */
+/* ---------- 14. Turnos de compra ---------- */
+
+// Lo básico del piso (papel, detergente...) no se reparte en tickets de 2 €:
+// lo compra cada vez uno, por turnos, en el orden de la lista de miembros.
+
+function crearTarjetaTurnos() {
+  const tarjeta = crear('section', 'tarjeta formulario');
+  tarjeta.id = 'turnos';
+  tarjeta.innerHTML =
+    '<h3>Turnos de compra</h3>' +
+    '<p>Lo básico del piso lo compra cada vez uno. Sin repartir tickets de 2 €.</p>' +
+    '<p id="turnos-vacio">Todavía no hay turnos.</p>' +
+    '<ul id="lista-turnos"></ul>' +
+    '<label for="turno-cosa">¿Qué compráis por turnos?</label>' +
+    '<input id="turno-cosa" type="text" maxlength="30" placeholder="Papel higiénico" autocomplete="off">' +
+    '<button id="crear-turno" class="boton boton-pequeno boton-secundario" type="button">Añadir turno</button>';
+  seccionDemo.appendChild(tarjeta);
+
+  // Un solo "escuchador" para todos los botones de la tarjeta
+  tarjeta.addEventListener('click', function (evento) {
+    const boton = evento.target.closest('button');
+    if (!boton) return;
+    if (boton.id === 'crear-turno') crearTurno();
+    if (boton.classList.contains('boton-comprado')) pasarTurno(Number(boton.dataset.id));
+    if (boton.classList.contains('boton-quitar-turno')) quitarTurno(Number(boton.dataset.id));
+  });
+}
+
+// A quién le toca: la persona en la posición "indice" de la lista de miembros
+function aQuienLeToca(turno, desplazamiento) {
+  const miembros = grupo().miembros;
+  return miembros[(turno.indice + (desplazamiento || 0)) % miembros.length];
+}
+
+// "te toca a ti" / "le toca a Pablo"
+function textoLeToca(nombre) {
+  return nombre === YO ? 'te toca a ti' : 'le toca a ' + nombre;
+}
+
+function pintarTurnos() {
+  const lista = document.getElementById('lista-turnos');
+  lista.innerHTML = '';
+
+  grupo().turnos.forEach(function (turno) {
+    const li = crear('li', 'pago turno');
+    if (aQuienLeToca(turno) === YO) li.classList.add('es-mi-turno');
+
+    li.appendChild(crear('span', '',
+      '🛒 ' + turno.cosa + ': ' + textoLeToca(aQuienLeToca(turno)) +
+      ' (después, ' + aQuienLeToca(turno, 1) + ')'));
+
+    const botones = crear('span', 'turno-botones');
+    botones.style.whiteSpace = 'nowrap'; // "Comprado · Quitar" en una sola línea
+    const comprado = crear('button', 'boton-borrar boton-comprado', 'Comprado');
+    comprado.type = 'button';
+    comprado.dataset.id = turno.id;
+    comprado.style.color = '#0E7D71';
+    const quitar = crear('button', 'boton-borrar boton-quitar-turno', 'Quitar');
+    quitar.type = 'button';
+    quitar.dataset.id = turno.id;
+    botones.appendChild(comprado);
+    botones.appendChild(document.createTextNode(' · '));
+    botones.appendChild(quitar);
+
+    li.appendChild(botones);
+    lista.appendChild(li);
+  });
+
+  document.getElementById('turnos-vacio').hidden = grupo().turnos.length > 0;
+}
+
+function crearTurno() {
+  const input = document.getElementById('turno-cosa');
+  const cosa = input.value.trim();
+  if (cosa === '') return mostrarError(input, 'Escribe qué compráis por turnos.');
+
+  contadorIds++;
+  grupo().turnos.push({ id: contadorIds, cosa: cosa, indice: 0 }); // empieza por ti
+  input.value = '';
+  actualizarTodo();
+}
+
+// Quien tenía el turno ya lo ha comprado: pasa al siguiente
+function pasarTurno(id) {
+  const turno = grupo().turnos.find(function (t) { return t.id === id; });
+  const quienCompro = aQuienLeToca(turno);
+  turno.indice = (turno.indice + 1) % grupo().miembros.length;
+  actualizarTodo();
+
+  const compro = quienCompro === YO ? 'Has comprado' : quienCompro + ' ha comprado';
+  mostrarMensaje('🛒 ' + compro + ' ' + turno.cosa.toLowerCase() + '. Ahora ' +
+                 textoLeToca(aQuienLeToca(turno)) + '.');
+}
+
+function quitarTurno(id) {
+  grupo().turnos = grupo().turnos.filter(function (t) { return t.id !== id; });
+  actualizarTodo();
+}
+
+
+/* ---------- 15. Repintar todo ---------- */
 
 // Cada vez que cambian los datos: repintar todas las tarjetas y guardar
 function actualizarTodo() {
@@ -1007,11 +1145,12 @@ function actualizarTodo() {
   pintarMeta();
   pintarRecurrentes();
   pintarHistorial();
+  pintarTurnos();
   guardarDatos();
 }
 
 
-/* ---------- 15. Vídeo, animaciones y cabecera ---------- */
+/* ---------- 16. Vídeo, animaciones y cabecera ---------- */
 
 // Sustituye el texto de #video-contenedor por el vídeo del proyecto
 function ponerVideo() {
@@ -1090,15 +1229,16 @@ function iniciarCabecera() {
 }
 
 
-/* ---------- 16. Arranque ---------- */
+/* ---------- 17. Arranque ---------- */
 
 crearBarraGrupo();
 crearCamposFormulario();
 crearHistorial();
 crearTarjetaDeudas();
 crearTarjetaAvisos();
-crearTarjetaMeta();
+crearTarjetaTurnos();
 crearTarjetaRecurrentes();
+crearTarjetaMeta();
 
 document.getElementById('selector-grupo').value = datos.grupoActivo;
 rellenarMiembros();
