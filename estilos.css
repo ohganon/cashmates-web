@@ -612,6 +612,70 @@ input, button, select { font: inherit; }
   color: #CFEFE7;
 }
 
+/* ===== Competencia: tabla con ✓ y ✗ ===== */
+#competencia > h2, #competencia > .antetitulo { display: block; width: fit-content; margin-left: auto; margin-right: auto; text-align: center; }
+.tabla-envoltorio {
+  overflow-x: auto;
+  border: 2px solid #E2E8E5;
+  border-bottom-width: 5px;
+  border-radius: 20px;
+  background: #FFFFFF;
+}
+
+.tabla-comparativa {
+  width: 100%;
+  min-width: 640px;
+  border-collapse: collapse;
+  text-align: center;
+}
+
+.tabla-comparativa th,
+.tabla-comparativa td {
+  padding: 14px 12px;
+  border-bottom: 2px solid #EEF2F1;
+}
+
+.tabla-comparativa tbody tr:last-child > * { border-bottom: 0; }
+
+.tabla-comparativa thead th {
+  background: #0F3D35;
+  color: #FFFFFF;
+  font-weight: 800;
+}
+
+.tabla-comparativa tbody th {
+  text-align: left;
+  font-weight: 800;
+  color: #0F3D35;
+}
+
+.tabla-comparativa .si    { color: #12A091; font-size: 1.3rem; font-weight: 800; }
+.tabla-comparativa .no    { color: #D9534F; font-size: 1.3rem; font-weight: 800; }
+.tabla-comparativa .medio { color: #8C9A95; }
+
+.tabla-comparativa .nosotros { background: #E3F4EF; }
+.tabla-comparativa thead .nosotros { background: #12A091; }
+
+.frase-usp {
+  margin: 26px auto 0;
+  max-width: 720px;
+  text-align: center;
+  font-size: 1.2rem;
+  line-height: 1.5;
+}
+
+.frase-usp strong { color: #12A091; }
+
+.solo-lectores {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+
 /* ===== Validación: una tarjeta por cliente real ===== */
 #validacion { text-align: center; }
 #validacion .antetitulo { color: #E0902A; }
@@ -867,6 +931,166 @@ input, button, select { font: inherit; }
 }
 
 .sesion .boton-borrar:hover { background: #FDF1EF; text-decoration: none; }
+
+/* --- Demo clara para el cliente ---
+   Arriba, lo principal en 3 pasos numerados:
+     1 Apunta un pago (izquierda)  ·  2 Cuánto has gastado  ·  3 Quién debe a quién (derecha)
+   Debajo, separado por un título, el resto de herramientas en tarjetas más discretas.
+   Solo CSS: las tarjetas las crea app.js y aquí solo se colocan. */
+.demo { counter-reset: paso; }
+
+#form-pago   { grid-column: 1; grid-row: 3 / span 3; }
+#resumen     { grid-column: 2; grid-row: 3; }
+#deudas      { grid-column: 2; grid-row: 4; }
+#avisos      { grid-column: 2; grid-row: 5; }
+
+/* Título que separa lo principal del resto (es una "tarjeta" invisible creada con CSS) */
+.demo::after {
+  content: "Más herramientas para el piso";
+  grid-column: 1 / -1;
+  grid-row: 6;
+  margin-top: 28px;
+  padding-top: 26px;
+  border-top: 2px dashed #D5DEDA;
+  text-align: center;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #0F3D35;
+}
+
+.demo.sin-sesion::after { display: none; }
+
+#turnos      { grid-column: 1; grid-row: 7; }
+#recurrentes { grid-column: 2; grid-row: 7; }
+#historial   { grid-column: 1; grid-row: 8; }
+#meta        { grid-column: 2; grid-row: 8; }
+
+/* Los 3 pasos principales llevan su número, como el happy path */
+#form-pago > h3::before,
+#resumen > h3::before,
+#deudas > h3::before {
+  counter-increment: paso;
+  content: counter(paso);
+  display: inline-grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  margin-right: 10px;
+  border-radius: 50%;
+  background: #12A091;
+  color: #FFFFFF;
+  font-size: .95rem;
+  vertical-align: 2px;
+}
+
+#resumen > h3 { color: #0F3D35; font-size: 1.2rem; }
+
+/* Los 3 pasos principales, con borde verde para que destaquen */
+#form-pago, #resumen, #deudas { border-color: #CFE7DF; }
+
+/* El resto, más discreto: fondo gris claro, sin el borde gordo y con un icono en el título */
+#avisos, #turnos, #recurrentes, #historial, #meta {
+  background: #FAFBFA;
+  border-bottom-width: 2px;
+  padding: 20px;
+}
+
+#avisos > h3, #turnos > h3, #recurrentes > h3, #historial > h3, #meta > h3 {
+  font-size: 1.05rem;
+  margin-bottom: 10px;
+}
+
+#meta .cifra-grande { font-size: 1.8rem; margin-bottom: 10px; }   /* que la meta no compita con "Has gastado" */
+#meta .meta-nombre { margin: 0; font-weight: 800; color: #0F3D35; }
+
+#avisos > h3::before      { content: "🔔 "; }
+#turnos > h3::before      { content: "🛒 "; }
+#recurrentes > h3::before { content: "🔁 "; }
+#historial > h3::before   { content: "🧾 "; }
+#meta > h3::before        { content: "🎯 "; }
+
+/* "Quién debe a quién" vacío o en paz: un mensaje verde, no una caja en blanco */
+#deudas-vacio {
+  margin: 0;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: #DDF3EC;
+  color: #0E7D71;
+  font-weight: 800;
+}
+
+#deudas-vacio::before { content: "😇 "; }
+
+/* Cuando nadie debe nada (app.js añade .en-paz): la tarjeta entera en verde */
+#deudas.en-paz { border-color: #12A091; background: #F2FBF8; }
+
+/* --- Historial y meta: desplegables (desplegables.js pone o quita .plegada) --- */
+.desplegable > h3 {
+  display: flex;
+  align-items: center;
+  margin: 0;
+  cursor: pointer;
+  user-select: none;
+  transition: color .2s;
+}
+
+.desplegable > h3:hover { color: #12A091; }
+
+.desplegable > h3::after {
+  content: "Ocultar ▴";
+  margin-left: auto;
+  padding: 4px 12px;
+  border: 2px solid #CFE7DF;
+  border-radius: 999px;
+  background: #FFFFFF;
+  font-size: .8rem;
+  color: #0E7D71;
+}
+
+.desplegable.plegada > h3::after { content: "Ver ▾"; }
+.desplegable:not(.plegada) > h3 { margin-bottom: 14px; }
+.desplegable.plegada > :not(h3) { display: none !important; }
+
+/* --- Estados de cada persona en "Quién debe a quién" ---
+   app.js escribe " · Moroso" y " · Urgente" dentro de un <strong>; aquí se esconde
+   ese texto y se pinta una chapita con su carita. */
+.pago.es-moroso, .pago.es-urgente {
+  margin: 0 -10px;
+  padding: 10px;
+  border-radius: 12px;
+}
+
+.pago.es-urgente { background: #FFF6EA; }
+.pago.es-moroso  { background: #FDECEA; }            /* si es moroso, gana el rojo */
+
+.pago.es-moroso > span:first-child  { color: #C4483A; font-weight: 800; }
+.pago.es-urgente > span:first-child { color: #B8690F; }
+
+.etiqueta-moroso,
+.etiqueta-urgente { font-size: 0; }                  /* esconde el " · " que pone app.js */
+
+.etiqueta-moroso::before,
+.etiqueta-urgente::before {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: .78rem;
+  font-weight: 800;
+  vertical-align: 1px;
+}
+
+.etiqueta-moroso::before  { content: "😬 Moroso";  background: #C4483A; color: #FFFFFF; }
+.etiqueta-urgente::before { content: "⏰ Urgente"; background: #F0A838; color: #FFFFFF; }
+
+/* Turnos: a quien le toca comprar se le marca */
+.turno.es-mi-turno {
+  margin: 0 -10px;
+  padding: 10px;
+  border-radius: 12px;
+  background: #E3F4EF;
+  font-weight: 800;
+}
 
 /* Tarjeta blanca con el borde de abajo más gordo, como el resto de la web */
 .tarjeta {
@@ -1235,8 +1459,11 @@ legend { padding: 0; }
 .pie a:hover { color: #2BC4AE; }
 
 /* ===== Presentación del Sprint 3: el Canva a buen tamaño y el enlace como botón ===== */
+#presentacion { text-align: center; }   /* etiqueta, título y enlace centrados */
+
 .presentacion-marco {
   max-width: 900px;
+  margin: 0 auto;                         /* el recuadro del Canva, centrado */
   aspect-ratio: 16 / 9;
   border-radius: 20px;
   overflow: hidden;
@@ -1353,6 +1580,11 @@ legend { padding: 0; }
   .demo { grid-template-columns: minmax(0, 1fr); }
   #form-pago, #resumen, #historial { grid-column: 1; grid-row: auto; }
   #acceso, #sesion { grid-row: auto; }
+  /* En el móvil, una columna en el orden de los pasos: 1, 2, 3, avisos y luego el resto */
+  #deudas, #avisos, #turnos, #recurrentes, #meta, .demo::after { grid-column: 1; grid-row: auto; }
+  #sesion { order: 1; } #form-pago { order: 2; } #resumen { order: 3; } #deudas { order: 4; }
+  #avisos { order: 5; } .demo::after { order: 6; } #turnos { order: 7; } #historial { order: 8; }
+  #recurrentes { order: 9; } #meta { order: 10; }
 
   .persona { flex-direction: column; text-align: center; }
   .persona-datos { padding-left: 0; list-style: none; }
