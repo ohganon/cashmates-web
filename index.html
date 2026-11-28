@@ -11,6 +11,7 @@
   <link rel="apple-touch-icon" href="assets/icono/apple-touch-icon.png">
   <link rel="stylesheet" href="estilos.css">
   <script src="app.js" defer></script>
+  <script src="acceso.js" defer></script>
 </head>
 <body>
 
@@ -85,7 +86,7 @@
          ============================================================ -->
     <section id="jose" class="seccion">
       <div class="persona">
-        <div class="persona-avatar" aria-hidden="true">J</div>
+        <img class="persona-avatar" src="assets/img/jose/jose-cara.svg" alt="" width="130" height="130">
         <div>
           <p class="antetitulo">Nuestro usuario</p>
           <h2>José, 22 años</h2>
@@ -93,26 +94,36 @@
             <li>Recién mudado a Madrid</li>
             <li>Comparte piso con 3 compañeros: Lucía, Pablo y Marta</li>
           </ul>
+          <ul class="compis">
+            <li><img src="assets/img/jose/lucia-cara.svg" alt="" width="56" height="56"> Lucía</li>
+            <li><img src="assets/img/jose/pablo-cara.svg" alt="" width="56" height="56"> Pablo</li>
+            <li><img src="assets/img/jose/marta-cara.svg" alt="" width="56" height="56"> Marta</li>
+          </ul>
           <blockquote class="persona-cita">«¿Gasto demasiado o me deben dinero?»</blockquote>
         </div>
       </div>
 
-      <h3 class="subtitulo">Una compra acaba en un conflicto</h3>
-      <ol class="viaje">
+      <!-- Customer journey: escenas animadas (SVG) de José y sus compañeros de piso.
+           Se generan con PRO3-sucio/problema3/collage-s3/escenas_web.py -->
+      <h3 class="subtitulo">El primer mes de José</h3>
+      <ol class="viaje viaje-animado">
         <li>
+          <img src="assets/img/jose/momento1.svg" alt="José llega con el carro de la compra y un ticket de 100 €; Lucía, Pablo y Marta sonríen encantados" width="760" height="640" loading="lazy">
           <span class="viaje-num">1</span>
-          <strong>José paga la compra: 100 €</strong>
-          <span>«Tranquilos, ya me lo devolvéis.»</span>
+          <strong>Adelanta todo él</strong>
+          <span>Paga la compra del piso: 100 €. Sus compañeros, encantados.</span>
         </li>
         <li>
+          <img src="assets/img/jose/momento2.svg" alt="Pasan los días en el calendario y José suda apurado mientras sus compañeros silban y miran a otro lado" width="760" height="640" loading="lazy">
           <span class="viaje-num">2</span>
-          <strong>Pasan los días y nadie le devuelve nada</strong>
-          <span>Le da apuro sacar el tema.</span>
+          <strong>Sigue sin cobrar</strong>
+          <span>Pasan los días y le da apuro reclamarlo.</span>
         </li>
         <li>
+          <img src="assets/img/jose/momento3.svg" alt="José, enfadado, mira en el móvil que le quedan 3,27 €; sus compañeros, sorprendidos" width="760" height="640" loading="lazy">
           <span class="viaje-num">3</span>
-          <strong>No le llega a fin de mes… y bronca</strong>
-          <span>«¡Que no me habéis devuelto el dinero!»</span>
+          <strong>Pierde el control</strong>
+          <span>Ya no sabe cuánto dinero es suyo y cuánto le deben.</span>
         </li>
       </ol>
     </section>
@@ -243,15 +254,37 @@
     <section id="validacion" class="seccion">
       <p class="antetitulo">Lo probaron</p>
       <h2>Qué nos dijeron los usuarios reales</h2>
+      <p class="entradilla">Se la enseñamos a gente que comparte piso, fuera de clase, y les pedimos que la probaran.</p>
       <div class="clientes">
         <article class="cliente">
+          <header class="cliente-cabecera">
+            <img class="cliente-foto" src="assets/img/clientes/daniel.png" alt="Foto de Daniel" width="88" height="88" loading="lazy">
+            <div>
+              <h3 class="cliente-nombre">Daniel, 22 años</h3>
+              <p class="cliente-quien">Estudia Diseño de Videojuegos · comparte piso en Burgos con 3 compañeros desde hace 3 años y medio</p>
+            </div>
+          </header>
           <p class="cliente-nota"><strong>7-8</strong><span>/10</span></p>
-          <p class="cliente-pregunta">¿La usarías en tu día a día?</p>
+          <p class="cliente-pregunta">¿La usarías en tu piso?</p>
           <blockquote>«Creo que está muy guapa y que funcionaría.»</blockquote>
-          <p class="cliente-pega"><strong>Lo que no le gustó:</strong> «Me suele dar bastante pereza apuntar todo.» → Por eso ahora los gastos fijos se apuntan solos.</p>
-          <p class="cliente-quien">Daniel, 22 años · estudiante, comparte piso en Burgos con 3 compañeros desde hace 3 años y medio</p>
+          <p class="cliente-pega"><strong>Su pega:</strong> «Nos suele dar bastante pereza apuntar todo.» Por eso ahora los gastos fijos se apuntan solos.</p>
         </article>
-        <!-- CLIENTE 2: cuando lo tengamos, copiar el <article> de arriba y cambiar los datos -->
+
+        <!-- CLIENTE 2: cuando tengamos su nombre, edad y foto, quitar el comentario y rellenar.
+        <article class="cliente cliente-2">
+          <header class="cliente-cabecera">
+            <img class="cliente-foto" src="assets/img/clientes/cliente2.png" alt="Foto de NOMBRE" width="88" height="88" loading="lazy">
+            <div>
+              <h3 class="cliente-nombre">NOMBRE, EDAD años</h3>
+              <p class="cliente-quien">ESTUDIOS O TRABAJO · comparte piso con su hermano desde hace un año</p>
+            </div>
+          </header>
+          <p class="cliente-nota"><strong>9</strong><span>/10</span></p>
+          <p class="cliente-pregunta">¿La usarías en tu piso?</p>
+          <blockquote>«Te quita de discusiones y refleja de forma transparente y visual los gastos de cada uno.»</blockquote>
+          <p class="cliente-pega"><strong>Lo que echó en falta:</strong> exportar el historial de gastos a Excel.</p>
+        </article>
+        -->
       </div>
     </section>
 
@@ -278,28 +311,39 @@
     </section>
 
     <!-- ============================================================
-         HAPPY PATH: el recorrido de José en la demo, paso a paso
+         HAPPY PATH: la historia de José resolviendo su problema.
+         Cada paso responde a un momento de su customer journey (sección #jose):
+           1 · paga él la compra   → la apunta y se reparte sola
+           2 · le da apuro reclamar → CashMates avisa por él
+           3 · bronca               → el piso, en paz
+         Sin explicar botones (lo pide el enunciado). En la presentación,
+         el piso de ejemplo ya va cargado antes de empezar.
          ============================================================ -->
     <section id="recorrido" class="seccion">
-      <p class="antetitulo">Pruébalo como José</p>
-      <h2>Tres pasos y el piso en paz</h2>
+      <p class="antetitulo">Así lo resuelve José</p>
+      <h2>Del primer mes de José… al piso en paz</h2>
       <ol class="viaje viaje-feliz">
         <li>
           <span class="viaje-num">1</span>
-          <strong>Carga el piso de ejemplo</strong>
-          <span>Pulsa «Cargar ejemplo»: tú eres José, y tu piso con Lucía, Pablo y Marta ya tiene gastos apuntados.</span>
+          <strong>Adelanta la compra: 100 €</strong>
+          <span>La apunta en 30 segundos y la web la reparte entre Lucía, Pablo, Marta y él.</span>
         </li>
         <li>
           <span class="viaje-num">2</span>
-          <strong>Apunta la compra: 100 €</strong>
-          <span>Importe, concepto, etiqueta «Comida» y entre quiénes se reparte. Si es fija, marca «Repetir cada mes».</span>
+          <strong>Ya no tiene que perseguir a nadie</strong>
+          <span>La marca como urgente y CashMates avisa por él hasta que le pagan.</span>
         </li>
         <li>
           <span class="viaje-num">3</span>
-          <strong>Mira quién debe a quién</strong>
-          <span>El saldo se actualiza solo, y quien debe mucho sale avisado. Cuando te pagan, pulsa «Saldar».</span>
+          <strong>El piso, en paz</strong>
+          <span>Todos ven quién debe a quién y, cuando le hacen el Bizum, se salda con un clic.</span>
         </li>
       </ol>
+      <div class="recorrido-final">
+        <p class="recorrido-resultado">En 30 segundos José sabe quién le debe y no tiene que reclamar nada.</p>
+        <blockquote>«Creo que está muy guapa y que funcionaría.» <cite>Daniel, 22 años</cite></blockquote>
+        <a class="boton" href="#demo" data-entrar-ejemplo>Pruébalo como José</a>
+      </div>
     </section>
 
     <!-- ============================================================
@@ -308,6 +352,19 @@
          ============================================================ -->
     <section id="demo" class="seccion demo">
       <h2>Tus cuentas</h2>
+
+      <!-- ACCESO RÁPIDO (simulado: no hay back-end, se guarda solo en este navegador).
+           acceso.js oculta la demo hasta que se entra y añade el saludo con "Salir". -->
+      <form id="acceso" class="tarjeta formulario acceso" hidden>
+        <img class="acceso-logo" src="assets/img/logo_caras.gif" alt="" width="72" height="72">
+        <h3>Entra en tu piso</h3>
+        <p class="acceso-texto">Sin contraseñas ni bancos: solo tu nombre.</p>
+        <label for="acceso-nombre">Tu nombre</label>
+        <input id="acceso-nombre" type="text" maxlength="20" placeholder="José" autocomplete="given-name">
+        <button class="boton" type="submit">Entrar</button>
+        <button id="acceso-ejemplo" class="boton boton-secundario" type="button">Probar con el piso de José</button>
+        <p class="acceso-nota">Es una demo: los datos se guardan solo en este navegador.</p>
+      </form>
 
       <!-- AÑADIR UN PAGO -->
       <form id="form-pago" class="tarjeta formulario">
