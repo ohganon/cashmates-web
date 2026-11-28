@@ -43,6 +43,38 @@ input, button, select { font: inherit; }
   text-decoration: none;
 }
 
+/* Menú de la cabecera: enlaces en verde oscuro y "Probar" como botón pequeño */
+.menu {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.menu a {
+  color: #0F3D35;
+  font-weight: 800;
+  text-decoration: none;
+  transition: color .2s;
+}
+
+.menu a:hover { color: #12A091; }
+
+.menu .menu-destacado {
+  padding: 8px 20px;
+  border-radius: 12px;
+  background: #12A091;
+  color: #FFFFFF;
+  box-shadow: 0 3px 0 #0E7D71;
+  transition: background .2s;
+}
+
+.menu .menu-destacado:hover { background: #2BC4AE; color: #FFFFFF; }
+
+.menu .menu-destacado:active {
+  transform: translateY(3px);
+  box-shadow: none;
+}
+
 /* ===== Portada: GIF a la izquierda, logo y texto a la derecha ===== */
 .portada {
   display: grid;
@@ -160,14 +192,25 @@ input, button, select { font: inherit; }
   margin: 0 0 24px;
 }
 
-/* Colores de cada sección (y de la anterior, para la transición), en el orden de la página */
-#personal { --fondo: #F4EFFF; --antes: #FFFFFF; }
-#problema { --fondo: #FFF6EA; --antes: #F4EFFF; }
-#solucion { --fondo: #EAF7F3; --antes: #FFF6EA; }
-#grupos   { --fondo: #EAF4FD; --antes: #EAF7F3; }
-#video    { --fondo: #FFFFFF; --antes: #EAF4FD; }
-#llamada  { --fondo: #0F3D35; --antes: #FFFFFF; --fundido: 36px; }   /* de claro a oscuro: fundido corto, si no queda turbio */
-#demo     { --fondo: #F5F7F6; --antes: #0F3D35; --fundido: 36px; }
+/* Colores de cada sección (y de la anterior, para la transición), en el orden de la página.
+   Si se añade, quita o mueve una sección en el HTML, hay que cambiar aquí su --antes y el de la siguiente. */
+#problema     { --fondo: #FFF6EA; --antes: #FFFFFF; }   /* después de la portada (blanca) */
+#jose         { --fondo: #FDEFF3; --antes: #FFF6EA; }   /* rosa suave, a juego con los compañeros */
+#solucion     { --fondo: #EAF7F3; --antes: #FDEFF3; }
+#novedades    { --fondo: #F4EFFF; --antes: #EAF7F3; }
+#competencia  { --fondo: #FFFFFF; --antes: #F4EFFF; }
+#grupos       { --fondo: #EAF4FD; --antes: #FFFFFF; }
+#video        { --fondo: #FFFFFF; --antes: #EAF4FD; }
+#validacion   { --fondo: #FFF6EA; --antes: #FFFFFF; }
+#presentacion { --fondo: #FFFFFF; --antes: #FFF6EA; }
+#llamada      { --fondo: #0F3D35; --antes: #FFFFFF; --fundido: 36px; }   /* de claro a oscuro: fundido corto, si no queda turbio */
+#recorrido    { --fondo: #EAF7F3; --antes: #0F3D35; --fundido: 36px; }
+#demo         { --fondo: #F5F7F6; --antes: #EAF7F3; }
+
+/* En las secciones blancas, la etiqueta pequeña (blanca) no se vería: le damos un fondo suave */
+#competencia .antetitulo,
+#video .antetitulo,
+#presentacion .antetitulo { background: #EEF2F1; }
 
 /* ===== Filas: texto y GIF lado a lado ===== */
 /* El orden lo marca el HTML: si el GIF va primero, sale a la izquierda */
@@ -206,8 +249,137 @@ input, button, select { font: inherit; }
   margin: 0 0 22px;
 }
 
-/* ===== Tu dinero: lista con checks morados ===== */
-#personal .antetitulo { color: #7656C2; }
+/* ===== José: ficha del usuario y customer journey animado ===== */
+#jose .antetitulo { color: #E0902A; }
+
+.persona {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  max-width: 760px;
+  margin: 0 auto 56px;
+}
+
+/* La cara de José (la misma cabeza que en las escenas) dentro de un círculo */
+.persona-avatar {
+  flex: 0 0 130px;
+  width: 130px;
+  height: 130px;
+  padding: 12px;
+  border-radius: 50%;
+  border: 5px solid #0F3D35;
+  background: #CFEFE7;
+  object-fit: contain;
+}
+
+.persona h2 { margin-bottom: 8px; }
+
+.persona-datos {
+  margin: 0 0 12px;
+  padding-left: 20px;
+  color: #5E6E69;
+  line-height: 1.6;
+}
+
+/* Las caras de sus compañeros de piso, debajo de sus datos */
+.compis {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 32px;
+  padding: 0;
+  margin: 8px 0 20px;
+}
+
+.compis li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  font-size: 1rem;
+  font-weight: 800;
+  color: #0F3D35;
+}
+
+.compis img {
+  width: 88px;
+  height: 88px;
+  padding: 6px;
+  border-radius: 50%;
+  border: 4px solid #0F3D35;
+  background: #EEF2F1;
+}
+
+.compis li:nth-child(1) img { background: #FDE3E0; }   /* a juego con la camiseta de cada uno */
+.compis li:nth-child(2) img { background: #E1EAFD; }
+.compis li:nth-child(3) img { background: #ECE5FC; }
+
+.persona-cita {
+  margin: 0;
+  font-size: clamp(1.3rem, 2.6vw, 1.7rem);
+  font-weight: 800;
+  color: #0F3D35;
+}
+
+.subtitulo {
+  margin: 0 0 8px;
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #0F3D35;
+}
+
+/* Los tres momentos: sin tarjetas, las escenas van directamente sobre el fondo */
+.viaje-animado {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 32px;
+}
+
+.viaje-animado li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+}
+
+.viaje-animado img {
+  width: 100%;
+  height: auto;
+  margin-bottom: 4px;
+}
+
+.viaje-animado .viaje-num {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #12A091;
+  color: #FFFFFF;
+  font-weight: 800;
+  box-shadow: 0 3px 0 #0E7D71;
+}
+
+.viaje-animado strong {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #0F3D35;
+}
+
+.viaje-animado li > span:last-child {
+  max-width: 280px;
+  color: #5E6E69;
+  line-height: 1.5;
+}
+
+/* ===== Novedades: lista con checks morados ===== */
+#novedades .antetitulo { color: #7656C2; }
 
 .ventajas {
   list-style: none;
@@ -325,6 +497,16 @@ input, button, select { font: inherit; }
   margin: 18px 0 0;
 }
 
+/* Cada fuente enlaza a la página original (se abre en otra pestaña) */
+.fuentes a {
+  color: #9A8F80;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color .2s;
+}
+
+.fuentes a:hover { color: #12A091; }
+
 /* ===== Solución: tarjetas con un círculo a juego con los iconos del GIF ===== */
 .tarjetas {
   list-style: none;
@@ -430,6 +612,264 @@ input, button, select { font: inherit; }
   color: #CFEFE7;
 }
 
+/* ===== Competencia: tabla con ✓ y ✗ ===== */
+#competencia > h2, #competencia > .antetitulo { display: block; width: fit-content; margin-left: auto; margin-right: auto; text-align: center; }
+.tabla-envoltorio {
+  overflow-x: auto;
+  border: 2px solid #E2E8E5;
+  border-bottom-width: 5px;
+  border-radius: 20px;
+  background: #FFFFFF;
+}
+
+.tabla-comparativa {
+  width: 100%;
+  min-width: 640px;
+  border-collapse: collapse;
+  text-align: center;
+}
+
+.tabla-comparativa th,
+.tabla-comparativa td {
+  padding: 14px 12px;
+  border-bottom: 2px solid #EEF2F1;
+}
+
+.tabla-comparativa tbody tr:last-child > * { border-bottom: 0; }
+
+.tabla-comparativa thead th {
+  background: #0F3D35;
+  color: #FFFFFF;
+  font-weight: 800;
+}
+
+.tabla-comparativa tbody th {
+  text-align: left;
+  font-weight: 800;
+  color: #0F3D35;
+}
+
+.tabla-comparativa .si    { color: #12A091; font-size: 1.3rem; font-weight: 800; }
+.tabla-comparativa .no    { color: #D9534F; font-size: 1.3rem; font-weight: 800; }
+.tabla-comparativa .medio { color: #8C9A95; }
+
+.tabla-comparativa .nosotros { background: #E3F4EF; }
+.tabla-comparativa thead .nosotros { background: #12A091; }
+
+.frase-usp {
+  margin: 26px auto 0;
+  max-width: 720px;
+  text-align: center;
+  font-size: 1.2rem;
+  line-height: 1.5;
+}
+
+.frase-usp strong { color: #12A091; }
+
+.solo-lectores {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+
+/* ===== Validación: una tarjeta por cliente real ===== */
+#validacion { text-align: center; }
+#validacion .antetitulo { color: #E0902A; }
+#validacion .entradilla { max-width: 640px; margin: 0 auto 32px; }
+
+.clientes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 520px));
+  justify-content: center;
+  gap: 28px;
+  text-align: left;
+}
+
+.cliente {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 26px;
+  background: #FFFFFF;
+  border: 2px solid #F0E2CF;
+  border-bottom-width: 5px;
+  border-radius: 20px;
+}
+
+.cliente-cabecera {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 6px;
+}
+
+.cliente-foto {
+  flex: 0 0 88px;
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid #12A091;
+  background: #EEF2F1;
+}
+
+.cliente-2 .cliente-foto { border-color: #E0A43A; }
+
+.cliente-nombre {
+  margin: 0 0 4px;
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #0F3D35;
+}
+
+.cliente-quien {
+  margin: 0;
+  font-size: .9rem;
+  line-height: 1.45;
+  color: #6B7A75;
+}
+
+.cliente-nota { margin: 0; line-height: 1; }
+.cliente-nota strong { font-size: 3.2rem; font-weight: 800; color: #12A091; }
+.cliente-2 .cliente-nota strong { color: #E0A43A; }
+.cliente-nota span { font-size: 1.4rem; font-weight: 800; color: #0F3D35; }
+
+.cliente-pregunta { margin: 0; font-size: .9rem; color: #6B7A75; }
+
+.cliente blockquote {
+  margin: 6px 0;
+  font-size: 1.25rem;
+  font-weight: 800;
+  line-height: 1.4;
+  color: #0F3D35;
+}
+
+.cliente-pega {
+  margin: 0;
+  padding: 10px 14px;
+  border-left: 5px solid #F0A838;
+  border-radius: 8px;
+  background: #FFF6EA;
+  font-size: .95rem;
+  line-height: 1.5;
+}
+
+/* ===== Happy path: los 3 pasos de José hasta el piso en paz ===== */
+#recorrido { text-align: center; }
+
+#recorrido h2 { margin-bottom: 40px; }
+
+/* Tres tarjetas en fila, unidas por una flecha */
+.viaje-feliz {
+  list-style: none;
+  padding: 0;
+  margin: 0 auto;
+  max-width: 1000px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 44px;
+  counter-reset: none;
+}
+
+.viaje-feliz li {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 30px 22px 26px;
+  background: #FFFFFF;
+  border: 2px solid #CFE7DF;
+  border-bottom-width: 5px;
+  border-radius: 20px;
+  transition: transform .2s, border-color .2s;
+}
+
+.viaje-feliz li:hover {
+  transform: translateY(-4px);
+  border-color: #12A091;
+}
+
+/* La flecha entre una tarjeta y la siguiente */
+.viaje-feliz li:not(:last-child)::after {
+  content: "→";
+  position: absolute;
+  right: -36px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #12A091;
+}
+
+.viaje-feliz .viaje-num {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #12A091;
+  color: #FFFFFF;
+  font-size: 1.2rem;
+  font-weight: 800;
+  box-shadow: 0 3px 0 #0E7D71;
+}
+
+/* El último paso, el del final feliz, en verde */
+.viaje-feliz li:last-child { background: #DDF3EC; border-color: #12A091; }
+
+.viaje-feliz strong {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #0F3D35;
+}
+
+.viaje-feliz li > span:last-child {
+  color: #5E6E69;
+  line-height: 1.5;
+}
+
+/* Resultado + cita real + botón a la demo */
+.recorrido-final {
+  max-width: 700px;
+  margin: 44px auto 0;
+}
+
+.recorrido-resultado {
+  margin: 0 0 18px;
+  font-size: clamp(1.4rem, 3vw, 1.9rem);
+  font-weight: 800;
+  line-height: 1.3;
+  color: #0F3D35;
+}
+
+.recorrido-final blockquote {
+  display: inline-block;
+  margin: 0 0 28px;
+  padding: 14px 22px;
+  border-left: 5px solid #F0A838;
+  border-radius: 12px;
+  background: #FFFFFF;
+  font-size: 1.1rem;
+  color: #3C3C3C;
+  text-align: left;
+}
+
+.recorrido-final cite {
+  display: block;
+  margin-top: 4px;
+  font-style: normal;
+  font-size: .9rem;
+  font-weight: 800;
+  color: #E0902A;
+}
+
+.recorrido-final .boton { display: table; margin: 0 auto; }
+
 /* ===== Demo: formulario a la izquierda, resumen e historial a la derecha ===== */
 .demo {
   display: grid;
@@ -444,9 +884,213 @@ input, button, select { font: inherit; }
   margin-bottom: 8px;
 }
 
-#form-pago  { grid-row: 2 / span 2; }   /* el formulario ocupa la altura del resumen y el historial */
+#form-pago  { grid-row: 3 / span 2; }   /* el formulario ocupa la altura del resumen y el historial (la fila 2 es la del acceso) */
 #resumen    { grid-column: 2; }
 #historial  { grid-column: 2; }
+
+/* --- Acceso rápido (acceso.js): sin sesión solo se ven el título y esta tarjeta --- */
+#acceso, #sesion { grid-column: 1 / -1; grid-row: 2; }
+
+.demo.sin-sesion > :not(h2):not(#acceso) { display: none !important; }
+
+.acceso {
+  justify-self: center;
+  width: 100%;
+  max-width: 440px;
+  text-align: center;
+}
+
+.acceso-logo { width: 72px; height: 72px; margin: 0 auto 4px; }
+.acceso h3 { margin-bottom: 4px; }
+.acceso-texto { margin: 0 0 6px; color: #6B7A75; }
+.acceso label { text-align: left; }
+.acceso .boton { width: 100%; margin-top: 12px; }
+.acceso-nota { margin: 10px 0 0; font-size: .85rem; color: #8C9A95; }
+
+/* Saludo con "Salir" cuando ya has entrado */
+.sesion {
+  justify-self: center;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 0;
+  padding: 8px 10px 8px 18px;
+  border: 2px solid #E2E8E5;
+  border-radius: 999px;
+  background: #FFFFFF;
+  font-weight: 800;
+  color: #0F3D35;
+}
+
+.sesion .boton-borrar {
+  padding: 6px 14px;
+  border: 2px solid #F3C9C2;
+  border-radius: 999px;
+  background: #FFFFFF;
+  transition: background .2s;
+}
+
+.sesion .boton-borrar:hover { background: #FDF1EF; text-decoration: none; }
+
+/* --- Demo clara para el cliente ---
+   Arriba, lo principal en 3 pasos numerados:
+     1 Apunta un pago (izquierda)  ·  2 Cuánto has gastado  ·  3 Quién debe a quién (derecha)
+   Debajo, separado por un título, el resto de herramientas en tarjetas más discretas.
+   Solo CSS: las tarjetas las crea app.js y aquí solo se colocan. */
+.demo { counter-reset: paso; }
+
+#form-pago   { grid-column: 1; grid-row: 3 / span 3; }
+#resumen     { grid-column: 2; grid-row: 3; }
+#deudas      { grid-column: 2; grid-row: 4; }
+#avisos      { grid-column: 2; grid-row: 5; }
+
+/* Título que separa lo principal del resto (es una "tarjeta" invisible creada con CSS) */
+.demo::after {
+  content: "Más herramientas para el piso";
+  grid-column: 1 / -1;
+  grid-row: 6;
+  margin-top: 28px;
+  padding-top: 26px;
+  border-top: 2px dashed #D5DEDA;
+  text-align: center;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #0F3D35;
+}
+
+.demo.sin-sesion::after { display: none; }
+
+#turnos      { grid-column: 1; grid-row: 7; }
+#recurrentes { grid-column: 2; grid-row: 7; }
+#historial   { grid-column: 1; grid-row: 8; }
+#meta        { grid-column: 2; grid-row: 8; }
+
+/* Los 3 pasos principales llevan su número, como el happy path */
+#form-pago > h3::before,
+#resumen > h3::before,
+#deudas > h3::before {
+  counter-increment: paso;
+  content: counter(paso);
+  display: inline-grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  margin-right: 10px;
+  border-radius: 50%;
+  background: #12A091;
+  color: #FFFFFF;
+  font-size: .95rem;
+  vertical-align: 2px;
+}
+
+#resumen > h3 { color: #0F3D35; font-size: 1.2rem; }
+
+/* Los 3 pasos principales, con borde verde para que destaquen */
+#form-pago, #resumen, #deudas { border-color: #CFE7DF; }
+
+/* El resto, más discreto: fondo gris claro, sin el borde gordo y con un icono en el título */
+#avisos, #turnos, #recurrentes, #historial, #meta {
+  background: #FAFBFA;
+  border-bottom-width: 2px;
+  padding: 20px;
+}
+
+#avisos > h3, #turnos > h3, #recurrentes > h3, #historial > h3, #meta > h3 {
+  font-size: 1.05rem;
+  margin-bottom: 10px;
+}
+
+#meta .cifra-grande { font-size: 1.8rem; margin-bottom: 10px; }   /* que la meta no compita con "Has gastado" */
+#meta .meta-nombre { margin: 0; font-weight: 800; color: #0F3D35; }
+
+#avisos > h3::before      { content: "🔔 "; }
+#turnos > h3::before      { content: "🛒 "; }
+#recurrentes > h3::before { content: "🔁 "; }
+#historial > h3::before   { content: "🧾 "; }
+#meta > h3::before        { content: "🎯 "; }
+
+/* "Quién debe a quién" vacío o en paz: un mensaje verde, no una caja en blanco */
+#deudas-vacio {
+  margin: 0;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: #DDF3EC;
+  color: #0E7D71;
+  font-weight: 800;
+}
+
+#deudas-vacio::before { content: "😇 "; }
+
+/* Cuando nadie debe nada (app.js añade .en-paz): la tarjeta entera en verde */
+#deudas.en-paz { border-color: #12A091; background: #F2FBF8; }
+
+/* --- Historial y meta: desplegables (desplegables.js pone o quita .plegada) --- */
+.desplegable > h3 {
+  display: flex;
+  align-items: center;
+  margin: 0;
+  cursor: pointer;
+  user-select: none;
+  transition: color .2s;
+}
+
+.desplegable > h3:hover { color: #12A091; }
+
+.desplegable > h3::after {
+  content: "Ocultar ▴";
+  margin-left: auto;
+  padding: 4px 12px;
+  border: 2px solid #CFE7DF;
+  border-radius: 999px;
+  background: #FFFFFF;
+  font-size: .8rem;
+  color: #0E7D71;
+}
+
+.desplegable.plegada > h3::after { content: "Ver ▾"; }
+.desplegable:not(.plegada) > h3 { margin-bottom: 14px; }
+.desplegable.plegada > :not(h3) { display: none !important; }
+
+/* --- Estados de cada persona en "Quién debe a quién" ---
+   app.js escribe " · Moroso" y " · Urgente" dentro de un <strong>; aquí se esconde
+   ese texto y se pinta una chapita con su carita. */
+.pago.es-moroso, .pago.es-urgente {
+  margin: 0 -10px;
+  padding: 10px;
+  border-radius: 12px;
+}
+
+.pago.es-urgente { background: #FFF6EA; }
+.pago.es-moroso  { background: #FDECEA; }            /* si es moroso, gana el rojo */
+
+.pago.es-moroso > span:first-child  { color: #C4483A; font-weight: 800; }
+.pago.es-urgente > span:first-child { color: #B8690F; }
+
+.etiqueta-moroso,
+.etiqueta-urgente { font-size: 0; }                  /* esconde el " · " que pone app.js */
+
+.etiqueta-moroso::before,
+.etiqueta-urgente::before {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: .78rem;
+  font-weight: 800;
+  vertical-align: 1px;
+}
+
+.etiqueta-moroso::before  { content: "😬 Moroso";  background: #C4483A; color: #FFFFFF; }
+.etiqueta-urgente::before { content: "⏰ Urgente"; background: #F0A838; color: #FFFFFF; }
+
+/* Turnos: a quien le toca comprar se le marca */
+.turno.es-mi-turno {
+  margin: 0 -10px;
+  padding: 10px;
+  border-radius: 12px;
+  background: #E3F4EF;
+  font-weight: 800;
+}
 
 /* Tarjeta blanca con el borde de abajo más gordo, como el resto de la web */
 .tarjeta {
@@ -727,6 +1371,74 @@ legend { padding: 0; }
 
 #borrar-todo:hover { background: #FDF1EF; }
 
+/* --- Botones nuevos de la demo (los crea app.js) --- */
+/* "Saldar", "Recordar" y "Comprado": acción buena, en verde, como .boton-secundario pero en pequeño */
+.boton-saldar,
+.boton-recordar,
+.boton-comprado {
+  padding: 6px 14px;
+  border: 2px solid #12A091;
+  border-radius: 999px;
+  background: #FFFFFF;
+  color: #0E7D71;
+  box-shadow: 0 3px 0 #CFE7DF;
+  transition: background .2s;
+}
+
+.boton-saldar:hover,
+.boton-recordar:hover,
+.boton-comprado:hover {
+  background: #E3F4EF;
+  text-decoration: none;
+}
+
+/* "Quitar" (turnos, gastos programados y meta): en rojo suave, como "Borrar todo" */
+.boton-quitar-turno,
+#lista-recurrentes .boton-borrar,
+#quitar-meta {
+  padding: 6px 14px;
+  border: 2px solid #F3C9C2;
+  border-radius: 999px;
+  background: #FFFFFF;
+  box-shadow: 0 3px 0 #F3C9C2;
+  transition: background .2s;
+}
+
+.boton-quitar-turno:hover,
+#lista-recurrentes .boton-borrar:hover,
+#quitar-meta:hover {
+  background: #FDF1EF;
+  text-decoration: none;
+}
+
+/* Al pulsarlos se hunden, igual que .boton */
+.boton-saldar:active,
+.boton-recordar:active,
+.boton-comprado:active,
+.boton-quitar-turno:active,
+#lista-recurrentes .boton-borrar:active,
+#quitar-meta:active {
+  transform: translateY(3px);
+  box-shadow: none;
+}
+
+/* "Comprado" y "Quitar" juntos en cada turno */
+.turno-botones {
+  display: flex;
+  flex-shrink: 0;
+  gap: 8px;
+}
+
+/* Botones pequeños al final de las tarjetas: separados de la lista y sin estirarse */
+#activar-notificaciones,
+#simular-mes,
+#crear-turno {
+  margin-top: 16px;
+  align-self: flex-start;
+}
+
+#quitar-meta { align-self: flex-start; margin-top: 10px; }
+
 /* ===== Pie ===== */
 .pie {
   background: #0F3D35;
@@ -737,6 +1449,117 @@ legend { padding: 0; }
 }
 
 .pie p { margin: 0; }
+
+.pie a {
+  color: #FFFFFF;
+  font-weight: 800;
+  transition: color .2s;
+}
+
+.pie a:hover { color: #2BC4AE; }
+
+/* ===== Presentación del Sprint 3: el Canva a buen tamaño y el enlace como botón ===== */
+#presentacion { text-align: center; }   /* etiqueta, título y enlace centrados */
+
+.presentacion-marco {
+  max-width: 900px;
+  margin: 0 auto;                         /* el recuadro del Canva, centrado */
+  aspect-ratio: 16 / 9;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 2px solid #E2E8E5;
+  border-bottom-width: 5px;
+  background: #F5F7F6;
+}
+
+.presentacion-marco iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.presentacion-enlace { margin: 18px 0 0; }
+
+.presentacion-enlace a {
+  display: inline-block;
+  padding: 10px 20px;
+  border: 2px solid #12A091;
+  border-radius: 16px;
+  background: #FFFFFF;
+  color: #12A091;
+  font-size: 14px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  text-decoration: none;
+  box-shadow: 0 4px 0 #0E7D71;
+  transition: background .2s;
+}
+
+.presentacion-enlace a:hover { background: #E3F4EF; }
+
+.presentacion-enlace a:active {
+  transform: translateY(4px);
+  box-shadow: none;
+}
+
+/* ===== Demo: grupo + "Cargar ejemplo" y casillas "Urgente" / "Repetir cada mes" ===== */
+#barra-grupo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #EEF2F1;
+}
+
+#barra-grupo label { font-size: .9rem; font-weight: 800; color: #6B7A75; }
+.formulario #barra-grupo select { flex: 1 1 160px; width: auto; }
+
+#opciones-pago {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+#opciones-pago label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border: 2px solid #D5DEDA;
+  border-radius: 999px;
+  color: #6B7A75;
+  font-size: .9rem;
+  cursor: pointer;
+  transition: background .2s, border-color .2s, color .2s;
+}
+
+#opciones-pago label:hover { background: #F1F7F5; }
+
+#opciones-pago input { width: 18px; height: 18px; margin: 0; accent-color: #12A091; }
+
+#opciones-pago label:has(input:checked) {
+  background: #E3F4EF;
+  border-color: #12A091;
+  color: #0E7D71;
+}
+
+/* Filtro del historial ("Ver: Todas") */
+#filtro-etiqueta {
+  margin: 0 0 12px 8px;
+  padding: 6px 10px;
+  border: 2px solid #D5DEDA;
+  border-radius: 10px;
+  background: #FFFFFF;
+  color: #3C3C3C;
+  cursor: pointer;
+}
+
+#filtro-etiqueta:hover { border-color: #12A091; }
 
 /* ===== Móvil: una sola columna ===== */
 @media (max-width: 800px) {
@@ -756,4 +1579,28 @@ legend { padding: 0; }
 
   .demo { grid-template-columns: minmax(0, 1fr); }
   #form-pago, #resumen, #historial { grid-column: 1; grid-row: auto; }
+  #acceso, #sesion { grid-row: auto; }
+  /* En el móvil, una columna en el orden de los pasos: 1, 2, 3, avisos y luego el resto */
+  #deudas, #avisos, #turnos, #recurrentes, #meta, .demo::after { grid-column: 1; grid-row: auto; }
+  #sesion { order: 1; } #form-pago { order: 2; } #resumen { order: 3; } #deudas { order: 4; }
+  #avisos { order: 5; } .demo::after { order: 6; } #turnos { order: 7; } #historial { order: 8; }
+  #recurrentes { order: 9; } #meta { order: 10; }
+
+  .persona { flex-direction: column; text-align: center; }
+  .persona-datos { padding-left: 0; list-style: none; }
+  .compis { justify-content: center; }
+  .viaje-feliz { grid-template-columns: minmax(0, 1fr); gap: 40px; max-width: 420px; }
+  .viaje-feliz li:not(:last-child)::after {   /* en el móvil la flecha apunta hacia abajo */
+    content: "↓";
+    right: auto;
+    left: 50%;
+    top: auto;
+    bottom: -38px;
+    transform: translateX(-50%);
+  }
+  .viaje-animado { grid-template-columns: minmax(0, 1fr); gap: 48px; }
+  .viaje-animado img { max-width: 420px; }
+
+  .cabecera { padding: 14px 20px; }
+  .menu a:not(.menu-destacado) { display: none; }   /* en el móvil solo queda "Probar" */
 }
