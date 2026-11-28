@@ -43,6 +43,38 @@ input, button, select { font: inherit; }
   text-decoration: none;
 }
 
+/* Menú de la cabecera: enlaces en verde oscuro y "Probar" como botón pequeño */
+.menu {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.menu a {
+  color: #0F3D35;
+  font-weight: 800;
+  text-decoration: none;
+  transition: color .2s;
+}
+
+.menu a:hover { color: #12A091; }
+
+.menu .menu-destacado {
+  padding: 8px 20px;
+  border-radius: 12px;
+  background: #12A091;
+  color: #FFFFFF;
+  box-shadow: 0 3px 0 #0E7D71;
+  transition: background .2s;
+}
+
+.menu .menu-destacado:hover { background: #2BC4AE; color: #FFFFFF; }
+
+.menu .menu-destacado:active {
+  transform: translateY(3px);
+  box-shadow: none;
+}
+
 /* ===== Portada: GIF a la izquierda, logo y texto a la derecha ===== */
 .portada {
   display: grid;
@@ -160,14 +192,26 @@ input, button, select { font: inherit; }
   margin: 0 0 24px;
 }
 
-/* Colores de cada sección (y de la anterior, para la transición), en el orden de la página */
-#personal { --fondo: #F4EFFF; --antes: #FFFFFF; }
-#problema { --fondo: #FFF6EA; --antes: #F4EFFF; }
-#solucion { --fondo: #EAF7F3; --antes: #FFF6EA; }
-#grupos   { --fondo: #EAF4FD; --antes: #EAF7F3; }
-#video    { --fondo: #FFFFFF; --antes: #EAF4FD; }
-#llamada  { --fondo: #0F3D35; --antes: #FFFFFF; --fundido: 36px; }   /* de claro a oscuro: fundido corto, si no queda turbio */
-#demo     { --fondo: #F5F7F6; --antes: #0F3D35; --fundido: 36px; }
+/* Colores de cada sección (y de la anterior, para la transición), en el orden de la página.
+   Si se añade, quita o mueve una sección en el HTML, hay que cambiar aquí su --antes y el de la siguiente. */
+#problema     { --fondo: #FFF6EA; --antes: #FFFFFF; }   /* después de la portada (blanca) */
+#jose         { --fondo: #FFFFFF; --antes: #FFF6EA; }
+#solucion     { --fondo: #EAF7F3; --antes: #FFFFFF; }
+#novedades    { --fondo: #F4EFFF; --antes: #EAF7F3; }
+#competencia  { --fondo: #FFFFFF; --antes: #F4EFFF; }
+#grupos       { --fondo: #EAF4FD; --antes: #FFFFFF; }
+#video        { --fondo: #FFFFFF; --antes: #EAF4FD; }
+#validacion   { --fondo: #FFF6EA; --antes: #FFFFFF; }
+#presentacion { --fondo: #FFFFFF; --antes: #FFF6EA; }
+#llamada      { --fondo: #0F3D35; --antes: #FFFFFF; --fundido: 36px; }   /* de claro a oscuro: fundido corto, si no queda turbio */
+#recorrido    { --fondo: #EAF7F3; --antes: #0F3D35; --fundido: 36px; }
+#demo         { --fondo: #F5F7F6; --antes: #EAF7F3; }
+
+/* En las secciones blancas, la etiqueta pequeña (blanca) no se vería: le damos un fondo suave */
+#jose .antetitulo,
+#competencia .antetitulo,
+#video .antetitulo,
+#presentacion .antetitulo { background: #EEF2F1; }
 
 /* ===== Filas: texto y GIF lado a lado ===== */
 /* El orden lo marca el HTML: si el GIF va primero, sale a la izquierda */
@@ -206,8 +250,8 @@ input, button, select { font: inherit; }
   margin: 0 0 22px;
 }
 
-/* ===== Tu dinero: lista con checks morados ===== */
-#personal .antetitulo { color: #7656C2; }
+/* ===== Novedades: lista con checks morados ===== */
+#novedades .antetitulo { color: #7656C2; }
 
 .ventajas {
   list-style: none;
@@ -324,6 +368,16 @@ input, button, select { font: inherit; }
   text-align: center;
   margin: 18px 0 0;
 }
+
+/* Cada fuente enlaza a la página original (se abre en otra pestaña) */
+.fuentes a {
+  color: #9A8F80;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color .2s;
+}
+
+.fuentes a:hover { color: #12A091; }
 
 /* ===== Solución: tarjetas con un círculo a juego con los iconos del GIF ===== */
 .tarjetas {
@@ -727,6 +781,74 @@ legend { padding: 0; }
 
 #borrar-todo:hover { background: #FDF1EF; }
 
+/* --- Botones nuevos de la demo (los crea app.js) --- */
+/* "Saldar", "Recordar" y "Comprado": acción buena, en verde, como .boton-secundario pero en pequeño */
+.boton-saldar,
+.boton-recordar,
+.boton-comprado {
+  padding: 6px 14px;
+  border: 2px solid #12A091;
+  border-radius: 999px;
+  background: #FFFFFF;
+  color: #0E7D71;
+  box-shadow: 0 3px 0 #CFE7DF;
+  transition: background .2s;
+}
+
+.boton-saldar:hover,
+.boton-recordar:hover,
+.boton-comprado:hover {
+  background: #E3F4EF;
+  text-decoration: none;
+}
+
+/* "Quitar" (turnos, gastos programados y meta): en rojo suave, como "Borrar todo" */
+.boton-quitar-turno,
+#lista-recurrentes .boton-borrar,
+#quitar-meta {
+  padding: 6px 14px;
+  border: 2px solid #F3C9C2;
+  border-radius: 999px;
+  background: #FFFFFF;
+  box-shadow: 0 3px 0 #F3C9C2;
+  transition: background .2s;
+}
+
+.boton-quitar-turno:hover,
+#lista-recurrentes .boton-borrar:hover,
+#quitar-meta:hover {
+  background: #FDF1EF;
+  text-decoration: none;
+}
+
+/* Al pulsarlos se hunden, igual que .boton */
+.boton-saldar:active,
+.boton-recordar:active,
+.boton-comprado:active,
+.boton-quitar-turno:active,
+#lista-recurrentes .boton-borrar:active,
+#quitar-meta:active {
+  transform: translateY(3px);
+  box-shadow: none;
+}
+
+/* "Comprado" y "Quitar" juntos en cada turno */
+.turno-botones {
+  display: flex;
+  flex-shrink: 0;
+  gap: 8px;
+}
+
+/* Botones pequeños al final de las tarjetas: separados de la lista y sin estirarse */
+#activar-notificaciones,
+#simular-mes,
+#crear-turno {
+  margin-top: 16px;
+  align-self: flex-start;
+}
+
+#quitar-meta { align-self: flex-start; margin-top: 10px; }
+
 /* ===== Pie ===== */
 .pie {
   background: #0F3D35;
@@ -737,6 +859,114 @@ legend { padding: 0; }
 }
 
 .pie p { margin: 0; }
+
+.pie a {
+  color: #FFFFFF;
+  font-weight: 800;
+  transition: color .2s;
+}
+
+.pie a:hover { color: #2BC4AE; }
+
+/* ===== Presentación del Sprint 3: el Canva a buen tamaño y el enlace como botón ===== */
+.presentacion-marco {
+  max-width: 900px;
+  aspect-ratio: 16 / 9;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 2px solid #E2E8E5;
+  border-bottom-width: 5px;
+  background: #F5F7F6;
+}
+
+.presentacion-marco iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.presentacion-enlace { margin: 18px 0 0; }
+
+.presentacion-enlace a {
+  display: inline-block;
+  padding: 10px 20px;
+  border: 2px solid #12A091;
+  border-radius: 16px;
+  background: #FFFFFF;
+  color: #12A091;
+  font-size: 14px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  text-decoration: none;
+  box-shadow: 0 4px 0 #0E7D71;
+  transition: background .2s;
+}
+
+.presentacion-enlace a:hover { background: #E3F4EF; }
+
+.presentacion-enlace a:active {
+  transform: translateY(4px);
+  box-shadow: none;
+}
+
+/* ===== Demo: grupo + "Cargar ejemplo" y casillas "Urgente" / "Repetir cada mes" ===== */
+#barra-grupo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #EEF2F1;
+}
+
+#barra-grupo label { font-size: .9rem; font-weight: 800; color: #6B7A75; }
+.formulario #barra-grupo select { flex: 1 1 160px; width: auto; }
+
+#opciones-pago {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+#opciones-pago label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border: 2px solid #D5DEDA;
+  border-radius: 999px;
+  color: #6B7A75;
+  font-size: .9rem;
+  cursor: pointer;
+  transition: background .2s, border-color .2s, color .2s;
+}
+
+#opciones-pago label:hover { background: #F1F7F5; }
+
+#opciones-pago input { width: 18px; height: 18px; margin: 0; accent-color: #12A091; }
+
+#opciones-pago label:has(input:checked) {
+  background: #E3F4EF;
+  border-color: #12A091;
+  color: #0E7D71;
+}
+
+/* Filtro del historial ("Ver: Todas") */
+#filtro-etiqueta {
+  margin: 0 0 12px 8px;
+  padding: 6px 10px;
+  border: 2px solid #D5DEDA;
+  border-radius: 10px;
+  background: #FFFFFF;
+  color: #3C3C3C;
+  cursor: pointer;
+}
+
+#filtro-etiqueta:hover { border-color: #12A091; }
 
 /* ===== Móvil: una sola columna ===== */
 @media (max-width: 800px) {
@@ -756,4 +986,7 @@ legend { padding: 0; }
 
   .demo { grid-template-columns: minmax(0, 1fr); }
   #form-pago, #resumen, #historial { grid-column: 1; grid-row: auto; }
+
+  .cabecera { padding: 14px 20px; }
+  .menu a:not(.menu-destacado) { display: none; }   /* en el móvil solo queda "Probar" */
 }
